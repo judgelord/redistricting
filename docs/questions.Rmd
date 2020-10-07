@@ -163,7 +163,10 @@ There are two sub-questions:
 
 ## Are advantaged delegations from more gerrymandered states biased toward the advantaged party?
 
-## Are majority delegations from more gerrymandered states biased toward the advantaged party?
+## Are disadvantaged delegations from more gerrymandered states biased toward the advantaged party?
+
+## Are black voters less well represented from cracked districts. From more gerrymandered states biased toward the advantaged party?
+
 
 # Ideally, we want is counterfactual levels representation and polarization at different levels of partisan advantage
 
