@@ -43,15 +43,15 @@ kablebox <- . %>%  knitr::kable() %>%
   scroll_box(height = "400px")
 ```
 
-In addition to brainstorming possible dependent and explanatory variables in [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q), this pages describes possible designs to study the effects of redistricting. 
+In addition to brainstorming possible dependent and explanatory variables in [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q), this pages describes possible designs to study the effects of redistricting, starting with the most basic models.
 
 Assume continuous measures of representation, polarization, ideological extremity, in the range $\{0,1\}$ like those described in the "DVs" sheet. 
 
 Also, assume a measure of partisan advantage, "packed" and "cracked" indicators, and other explanatory variables like those described in the "EVs" sheet.
 
-# Are "packed" districts represented differently than other safe districts?
+## Are "packed" districts represented differently than other safe districts?
 
-## Are representatives from packed districts less aligned with voters? 
+#### Are representatives from packed districts less aligned with voters? 
 
 Let $y_i$ be a measure of representation for official $i$.
 
@@ -62,7 +62,7 @@ Let $p_i$ be an indicator of whether $i$'s district is packed.
 We can simulate data for a hypothetical set of safe districts (e.g., $v > 5%$). For illustration, I set the mean of $Y$ to .4 for packed districts and .6 for non-packed districts.
 
 ```{r rep_packed, fig.show='hold', out.width="40%", fig.width=3, fig.height=1.5}
-packed <- tibble(packed = 1, 
+packed <- tibble(packed = T, 
                  vote_margin = sample(seq(5,45, 1), 
                                       100, 
                                       replace = T),
@@ -70,7 +70,7 @@ packed <- tibble(packed = 1,
                                         .4, 
                                         .1))
 
-notpacked <- tibble(packed = 0, 
+notpacked <- tibble(packed = F, 
                  vote_margin = sample(seq(5,45, 1), 
                                       100, 
                                       replace = T),
@@ -78,54 +78,57 @@ notpacked <- tibble(packed = 0,
                                         .6, 
                                         .1))
 
-d <- full_join(packed, notpacked)
+d <- full_join(packed, notpacked) 
 
 ggplot(d) + 
   aes(x = representation, 
-      fill = factor(packed)) +
+      fill = packed) +
   geom_histogram()
 
 ggplot(d) + 
   aes(x = vote_margin, 
-      fill = factor(packed)) +
+      fill = packed) +
   geom_histogram()
 ```
 
-We can estimate representation given the vote margin and whether a district is packed, $y|p,v$
+We can then estimate representation given the vote margin and whether a district is packed, $y|p,v$
 
 
 A linear fit would look like this: 
 
-$\hat{y_i} = \beta_0 + \beta_1 p_i + \beta_2 v_i + \epsilon_i$
+$\hat{y_i} = \beta_0 + \beta_1 p_i + \beta_2 v_i$
 
 ```{r rep_packed_model,fig.width=5, fig.height=3}
 ggplot(d) +
   aes(x = vote_margin, 
       y = representation, 
-      color = factor(packed)) + 
+      color = packed) + 
   geom_point(alpha = .2) + 
   geom_smooth(method = "lm") + 
   scale_color_viridis_d()
 ```
 
-# Are representatives from packed districts more extreme?
+## Are representatives from packed districts more extreme?
 
 Now let $y_i$ be a measure of ideological extremity.
 
-We estimate ideological extremity given the vote margin and whether a district is packed $y|p,v$
+
 
 ```{r polar_packed, fig.show='hold', out.width="40%", fig.width=3, fig.height=1.5}
-# d %<>% mutate(ideological_extremity = ifelse(packed == 1,...))
+## d %<>% mutate(ideological_extremity = ifelse(packed == 1,...))
 d$ideological_extremity <- rbeta(200, 1, 3)
 
 ggplot(d) + 
   aes(x = ideological_extremity, 
-      fill = factor(packed)) +
+      fill = packed) +
   geom_histogram()
 ```
+
+We can then estimate ideological extremity given the vote margin and whether a district is packed, $y|p,v$.
+
 A linear fit would look like this: 
 
-$\hat{y_i} = \beta_0 + \beta_1 p_i + \beta_2 v_i + \epsilon_i$
+$\hat{y_i} = \beta_0 + \beta_1 p_i + \beta_2 v_i$
 
 ```{r polar_packed_model,fig.width=5, fig.height=3}
 m2 <- lm(ideological_extremity ~ packed + vote_margin,
@@ -135,8 +138,8 @@ m2 <- lm(ideological_extremity ~ packed + vote_margin,
 ggplot(m2) +
   aes(x = vote_margin, 
       y = ideological_extremity, 
-      color = factor(packed),
-      fill = factor(packed) ) + 
+      color = packed,
+      fill = packed ) + 
   geom_point(alpha = .2) + 
   geom_ribbon(aes(ymin = .fitted - .se.fit,
                   ymax = .fitted + .se.fit),
@@ -147,28 +150,101 @@ ggplot(m2) +
   scale_fill_viridis_d()
 ```
 
-# Are "minimal secure margin" districts represented differently than other relatively secure districts?
+## Are "cracked"/"minimal secure margin" districts represented differently than other relatively secure districts?
 
 Now consider the set of districts with voter splits like those engineered by a partisan gerrymander (margins $v$ about +5% for the advantaged party).  
 
-We estimate ideological extremity given the vote margin and whether a district is packed $y|p,v$
+Let $c_i$ be a measure of whether representative $i$'s district is "cracked."
 
-$\hat{y_i} = \beta_0 + \beta_1 p_i + \beta_2 v_i + \epsilon_i$
+For $v_i \in[5,10]$, we can then test for a difference in mean ideological extremity by whether a district is cracked $y|c$. 
 
-# Are delegations from more gerrymandered states biased toward the advantaged party?
+```{r polar_cracked, fig.width=5, fig.height=3}
+## use same sampe dist
+d$cracked <- d$packed
+
+d1 <- d %>% filter(vote_margin >= 5, 
+                   vote_margin <= 10)
+
+d1 %<>% group_by(cracked) %>% 
+  mutate(mean = mean(ideological_extremity))
+
+
+d1 %>% ggplot() +
+  aes(x = vote_margin,
+      y = ideological_extremity,
+      color = cracked) + 
+  geom_boxplot() +
+  geom_point() + 
+  facet_grid(. ~ cracked) + 
+  #geom_line(aes(y = mean))+ 
+  scale_color_viridis_d()
+
+t.test(x = d1 %>% filter(cracked) %>%
+         .$ideological_extremity,
+       y = d1 %>% filter(!cracked) %>%
+         .$ideological_extremity) 
+```
+---
+
+## Are black voters in cracked distrcits less well represented? 
+
+Now let $y_1$ be a measure of representation of Black residents. 
+
+Let $b_i$ be the percent of $i$'s district's residents that identify as Black.
+
+```{r rep_cracked_black, fig.show='hold', out.width="40%", fig.width=3, fig.height=1.5}
+## use same sample dist
+d$black_representation <- d$representation
+
+## draw percent black
+d$percent_black <- rbeta(200, 1, 3)
+
+ggplot(d) + 
+  aes(x = percent_black, 
+      fill = cracked) +
+  geom_histogram()
+```
+A linear fit would look like this: 
+
+$\hat{y_i} = \beta_0 + \beta_1 c_i + \beta_2 b_i + \beta_3 c_i b_i$
+
+```{r rep_cracked_black_model,fig.width=5, fig.height=3}
+m2 <- lm(black_representation ~ cracked*percent_black,
+         data = d)  %>% 
+  augment(se_fit = T)
+
+ggplot(m2) +
+  aes(x = percent_black, 
+      y = black_representation, 
+      color = cracked,
+      fill = cracked ) + 
+  geom_point(alpha = .2) + 
+  geom_ribbon(aes(ymin = .fitted - .se.fit,
+                  ymax = .fitted + .se.fit),
+              alpha = .5,
+              color = NA) + 
+  geom_line(aes(y = .fitted)) + 
+  scale_color_viridis_d()+ 
+  scale_fill_viridis_d()
+```
+
+---
+
+### Are delegations from more gerrymandered states biased toward the advantaged party?
 
 The aim of partisan gerrymandering is to shift politics in a state toward 
 
 There are two sub-questions:
 
-## Are advantaged delegations from more gerrymandered states biased toward the advantaged party?
+#### Are *advantaged* delegations from more gerrymandered states more ideologically extreme?
 
-## Are disadvantaged delegations from more gerrymandered states biased toward the advantaged party?
+#### Are *disadvantaged* delegations from more gerrymandered states biased toward the advantaged party?
 
-## Are black voters less well represented from cracked districts. From more gerrymandered states biased toward the advantaged party?
+---
 
+## Limitations
 
-# Ideally, we want is counterfactual levels representation and polarization at different levels of partisan advantage
+Ideally, we want is counterfactual levels representation and polarization at different levels of partisan advantage.
 
 The level of partisan advantage is always confounded by time (in within-state) or state characteristics (in across-state analysis).
 
