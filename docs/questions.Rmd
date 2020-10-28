@@ -45,6 +45,71 @@ kablebox <- . %>%  knitr::kable() %>%
 
 In addition to brainstorming possible dependent and explanatory variables in [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q), this pages describes possible designs to study the effects of redistricting, starting with the most basic models.
 
+# Tensions among goals 
+
+```{r tensions, fig.width=11}
+# imagined data maximizing interest coherence 
+interest <- tibble(district = 1:15,
+                   majority_party_vote = c(rep(100,8), 
+                                      rep(0,7)) ) %>%
+  mutate(minority_party_vote = 100-majority_party_vote)
+
+# imagined data maximizing competitiveness
+competitive <- tibble(district = 1:15,
+                      majority_party_vote = c(100,
+                                         rep(50,14)  )) %>%
+  mutate(minority_party_vote = 100-majority_party_vote) 
+
+# imagined data maximizing majority seats
+majority <- tibble(district = factor(1:15),
+                   majority_party_vote = c(rep(55,14), 
+                                      rep(30,1)))%>%
+  mutate(minority_party_vote = 100-majority_party_vote) 
+
+# imagined data maximizing
+minority <- tibble(district = factor(1:15),
+                   minority_party_vote = c(rep(10,2),
+                                           20,
+                                           rep(55,12) ) ) %>%
+  mutate(majority_party_vote = 100-minority_party_vote) 
+
+dplot <- function(d){
+ggplot(d) +
+  aes(x = factor(district), 
+      y = majority_party_vote) + 
+  geom_col() + 
+    geom_text(aes(label = ifelse(majority_party_vote == 45 | minority_party_vote ==45,
+                   "Cracked", NA)), 
+               vjust = -1) +
+        geom_text(aes(label = ifelse(majority_party_vote %in% c(10,20,30) | minority_party_vote %in% c(10,20,30),
+                   "Packed", NA)), 
+               vjust = -1) +
+  scale_y_continuous(limits = c(0,100) ) +
+    labs(x = "District")
+}
+
+
+dplot(interest) + 
+  labs(title = "Districting that maximizes interest alignment within districts",
+  y = str_c("Expected Majority Party Votes = ", sum(interest$majority_party_vote>50)))
+
+dplot(competitive) + 
+  labs(title = "Districting that maximizes the number of competitive districts\n (and thus proportionality, in expectation)",
+  y = str_c("Expected Majority Party Votes = 1 + (14*.5) = 8"))
+
+dplot(majority) + 
+  labs(title = "Districting that maximizes majority-party seats",
+  y = str_c("Expected Majority Party Votes = ", sum(majority$majority_party_vote>50))) 
+
+dplot(minority) + 
+  labs(title = "Districting that maximizes minority-party seats",
+  y = str_c("Expected Majority Party Votes = ", sum(minority$majority_party_vote>50)))
+```
+
+
+
+# Mockups
+
 Assume continuous measures of representation, polarization, ideological extremity, in the range $\{0,1\}$ like those described in the "DVs" sheet. 
 
 Also, assume a measure of partisan advantage, "packed" and "cracked" indicators, and other explanatory variables like those described in the "EVs" sheet.
@@ -150,6 +215,8 @@ ggplot(m2) +
   scale_fill_viridis_d()
 ```
 
+---
+
 ## Are "cracked"/"minimal secure margin" districts represented differently than other relatively secure districts?
 
 Now consider the set of districts with voter splits like those engineered by a partisan gerrymander (margins $v$ about +5% for the advantaged party).  
@@ -184,6 +251,7 @@ t.test(x = d1 %>% filter(cracked) %>%
        y = d1 %>% filter(!cracked) %>%
          .$ideological_extremity) 
 ```
+
 ---
 
 ## Are black voters in cracked distrcits less well represented? 
@@ -231,8 +299,6 @@ ggplot(m2) +
 ---
 
 ### Are delegations from more gerrymandered states biased toward the advantaged party?
-
-The aim of partisan gerrymandering is to shift politics in a state toward 
 
 There are two sub-questions:
 
