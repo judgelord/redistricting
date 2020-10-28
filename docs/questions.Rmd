@@ -80,6 +80,7 @@ ggplot(d) +
   aes(x = factor(district), 
       y = majority_party_vote) + 
   geom_col() + 
+    geom_hline(yintercept = 50) +
     geom_text(aes(label = ifelse(majority_party_vote == 45 | minority_party_vote ==45,
                    "Cracked", NA)), 
                vjust = -1) +
