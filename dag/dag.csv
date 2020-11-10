@@ -2,23 +2,89 @@ core,from,edge,to,cites,mechanism
 T,metric - compactness,"Parabolic (but positive for partisan gerrymandered maps, maybe most maps?) for any geographically-concentrated community",goal - communities preserved,NA,NA
 T,metric - compactness,"Parabolic, but negative for most existing maps.
 Makes highly partisan maps more difficult to draw",goal - partisan advantage,NA,NA
-T,goal - Number of of competitive districts,increases (mean) but makes big swings possible (may increase variance),goal - proportionality,NA,"- Competitiveness increases variance in the proportionality of seats
+T,goal - Number of competitive districts,increases (mean) but makes big swings possible (may increase variance),goal - proportionality,NA,"- Competitiveness increases variance in the proportionality of seats
 - Increasing certainty of proportional outcome means decreasing the competitiveness of districts"
-T,goal - proportionality,ensuring proportionally means few swing districts,goal - Number of of competitive districts,NA,proportionality is inverse to measures like wasted votes and the efficiency gap
-T,goal - Number of of competitive districts,"decreases if cor(party,community)>0",goal - communities preserved,NA,NA
+T,goal - proportionality,ensuring proportionally means few swing districts,goal - Number of competitive districts,NA,proportionality is inverse to measures like wasted votes and the efficiency gap
+T,goal - Number of competitive districts,"decreases if cor(party,community)>0",goal - communities preserved,NA,NA
+NA,goal - communities preserved,decreases,goal - Number of competitive districts,NA,NA
 T,goal - partisan advantage,decreases,goal - proportionality,NA,A partisan gerrymander aims to diverge from proportionality
 T,goal - proportionality,decreases,goal - partisan advantage,NA,NA
 T,goal - proportionality,"increases in expectation if cor(party,community)>0",goal - communities preserved,NA,NA
 T,goal - communities preserved,"increases in expectation if cor(party,community)>0, but in practice, lumping enough members of come communities to secure a seat (e.g. a majority minority district) can be tricky depending on the dispersion of the population",goal - proportionality,NA,NA
-T,goal - partisan advantage,decreases,goal - Number of of competitive districts,NA,A partisan gerrymander aims to decrease the number of competitive district
-T,goal - Number of of competitive districts,decreases,goal - partisan advantage,NA,NA
-T,goal - partisan advantage,decreases overall (but heterogeneous and conditional on correlation between party and interest),goal - communities preserved,NA,"A partisan gerrymander aims to maximize ""minimally safe"" districts"
-T,goal - communities preserved,decreases overall (but heterogeneous and conditional on correlation between party and interest),goal - partisan advantage,NA,"- Conflicting in ""cracked""/""minimally safe"" districts
+T,goal - partisan advantage,decreases,goal - Number of competitive districts,NA,A partisan gerrymander aims to decrease the number of competitive district
+T,goal - Number of competitive districts,decreases,goal - partisan advantage,NA,NA
+T,goal - partisan advantage,decreases overall (but heterogeneous and conditional on correlation between party and community),goal - communities preserved,NA,"A partisan gerrymander aims to maximize ""minimally safe"" districts"
+T,goal - communities preserved,decreases overall (but heterogeneous and conditional on correlation between party and community),goal - partisan advantage,NA,"- Conflicting in ""cracked""/""minimally safe"" districts
 - Aligned for packed districts"
 T,goal - communities preserved,?,policy - majority minority districts,NA,NA
 T,policy - majority minority districts,increases,goal - proportionality,NA,NA
-T,policy - majority minority districts,decreases,goal - Number of of competitive districts,NA,NA
-T,goal - Number of of competitive districts,increases,effect - legislator information seeking,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+T,policy - majority minority districts,decreases,goal - Number of competitive districts,NA,NA
+T,goal - Number of competitive districts,increases,effect - legislator information seeking,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
 T,effect - legislator information seeking,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
 T,effect - legislator information about district,increases,effect - floor votes align with district preferences,"Butler, D and Nickerson, D 2011, Broockman and Skovron 2018, and Hertel-Fernandez et al. 2018",NA
 T,goal - communities preserved,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+NA,goal - proportionality,increases,effect - Alignment of floor vote breakdown with majority,NA,If the number of representatives from each party is proportional to the state population then the delegation's floor votes will often break down similar to the distribution of preferences in the state population.
+NA,NA,NA,NA,NA,NA
+NA,goal - Number of competitive districts,"decreases if cor(party,municipality)>0",goal - preserve municipal jurisdictions,NA,NA
+NA,value - historical continuity,"heterogeneously correlated (depending on goals of past districting); often increases (where lines previously mapped onto communities), but may decrease where community was previously cracked",goal - communities preserved,NA,NA
+NA,goal - preserve communities of interest,increases,goal - communities preserved,NA,NA
+NA,goal - preserve municipal jurisdictions,increases,goal - communities preserved,NA,NA
+NA,value - historical continuity,heterogeneously correlated (depending on goals of past districting),metric - compactness,NA,NA
+NA,value - historical continuity,increases,goal - core retention,NA,NA
+NA,NA,NA,NA,NA,NA
+NA,value - historical continuity,heterogeneously correlated (depending on goals of past districting),goal - communities preserved,NA,NA
+NA,value - geographic continuity,heterogeneously correlated,metric - compactness,NA,NA
+NA,value - geographic continuity,heterogeneously correlated,goal - core retention,NA,NA
+NA,value - geographic continuity,heterogeneously correlated,goal - communities preserved,NA,NA
+NA,value - minority rights,parabolic,goal - proportional minority representation,NA,NA
+NA,goal - proportional minority representation,increases,goal - proportionality,NA,NA
+NA,value - community,increases,goal - communities preserved,NA,NA
+NA,goal - core retention,increases,effect - incumbent advantage,NA,NA
+NA,policy - incumbent stays,increases,effect - incumbent advantage,NA,NA
+NA,effect - incumbent's constituents change,increases (but only meaningfully for already fairly competitive districts),goal - Number of competitive districts,Desposato & Petrocik,NA
+NA,condition - competitiveness (partisan balance),increases,effect - constituent service,Ashworth and Bueno de Mesquita 2005,NA
+NA,condition - single member districts,increase,effect - constituent service,Ashworth and Bueno de Mesquita 2006,NA
+NA,condition - independent executive,increases,effect - constituent service,Ashworth and Bueno de Mesquita 2007,NA
+NA,effect - voters' fellow constituents change,decreases,effect - voter information,Hayes & McKee 2009,NA
+NA,effect - voter information about their district,decreases,effect - rolloff,Hayes & McKee 2008,NA
+NA,effect - voter information about their district,decreases,effect - turnout,Sekhon and Titiunik (2007),NA
+NA,goal - proportionality,increases,effect - House-Senate Delegation alignment,Chen 2010,NA
+NA,effect - House-Senate delegation alignment,decreases,policy - pork spending,Chen 2011,NA
+NA,effect - voters' fellow constituents change,decreases heterogeneously by race,effect - voter sense of place,Hayes & McKee 2011,NA
+NA,effect - voter sense of place,increases,effect - turnout,NA,NA
+NA,goal - core retention,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+NA,goal - communities preserved,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+NA,goal - Number of competitive districts,decreases,effect - electoral security,NA,NA
+NA,effect - electoral security,increases,effect - extremism,NA,NA
+NA,goal - communities preserved,increases,effect - # of districts with competitive primaries,NA,NA
+NA,goal - Number of competitive districts,decreases,effect - # of districts with competitive primaries,NA,NA
+NA,effect - # of districts with competitive primaries,increases,effect - floor voting extremism,NA,NA
+NA,effect - # of districts with competitive primaries,increases,effect - performative extremism,NA,NA
+NA,effect - electoral security,increases,effect - length in office,NA,NA
+NA,effect - length in office,increases,effect - institutional power,NA,NA
+NA,effect - length in office,increases,effect - constituent service,judge-lord et al,NA
+NA,effect - institutional power,increases,effect - constituent service,judge-lord et al,NA
+NA,effect - electoral security,decreases,effect - performative representation,NA,NA
+NA,effect - electoral security,decreases,effect - legislative effort,NA,NA
+NA,goal - Number of competitive districts,increases,effect - campaign spending,NA,NA
+NA,effect - campaign spending,increases,effect - corporate bias,Powell et al,NA
+NA,effect - campaign spending,increases,effect - elite bias,Bonica,NA
+NA,goal - proportionality,decreases,effect - majority,NA,NA
+NA,goal - communities preserved,increases heterogeneously by race,effect - turnout,Sekhon and Titiunik (2007),NA
+NA,goal - communities preserved,decreases heterogeneously by race,effect - rolloff,Hayes & McKee 2011,NA
+NA,condition - dispersed minority population,decreases,goal - proportional minority representation,Cain et al 2005,NA
+NA,condition - race-partisanship correlation,conditions,tradeoff - preserve communities of interest vs. Number of competitive districts,NA,NA
+NA,policy - minority influence districts,increases,goal - Number of competitive districts,NA,NA
+NA,policy - minority influence districts,decreases,effect - incumbent advantage,NA,NA
+NA,policy - majority minority districts,decreases,effect - interracial coalitions,Swain (1993),NA
+NA,policy - majority minority districts,increases,effect - extremism,Swain (1993),NA
+NA,policy - majority minority districts,decreases,effect - minority representation,Cameron et al. 1996,NA
+NA,NA,NA,NA,NA,NA
+NA,policy - majority minority districts,increases,effect - # of racial minority representatives,Griffin & Newman 2007,NA
+NA,effect - # of racial minority representatives,increases,effect - policy preferred by racial minorities,"Griffin & Newman 2007, Canon 1999, Gay 2007, Bratton & Haynie 1999",NA
+NA,effect - policy preferred by racial minorities,increases,effect - material benefits for racial minorities,Griffin & Newman 2007,NA
+NA,NA,NA,NA,NA,NA
+NA,goal - incumbent safety,decreases,goal - partisan advantage,"Cain 1985, Wyrick 1991",NA
+NA,NA,NA,NA,NA,NA
+NA,NOT SURE HOW TO THINK ABOUT THIS AT THE STATE LEVEL,NA,NA,NA,NA
+NA,condition - proportion of minority voters (in a district),increases (outstanding question),effect - minority substantive representation,"Cameron et al. 1996, Shotts 2003, Handley et al. 1998, Bullock 1995, Overby & Cosgrove 1996, Sharpe & Garand 2001, Swain 1993, Overby & Cosgrove 1996, LeVeaux & Garand 2003",NA
