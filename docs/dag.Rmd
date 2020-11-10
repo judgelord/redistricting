@@ -94,8 +94,8 @@ nodes <- nodes %>% mutate(label = id,
 edges <- edges %>% mutate(
   title = paste0("<p>", detail, "</p>"),
   #label = type,
-  color = ifelse(str_detect(type, "^increase"), "#036606", "#dbd9db"),
-  color = ifelse(str_detect(type, "^decrease"), "#f77272", color) ) 
+  color = ifelse(str_detect(type, "^increase"), "#81a275", "#617d9f"),
+  color = ifelse(str_detect(type, "^decrease"), "#b14552", color) ) 
 
 
 
