@@ -39,7 +39,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 ```{r}
-# refresh data from google sheet
+# refresh data from google sheet if token is present
 if(gs4_has_token()){
 
 ss <- googledrive::drive_get("redistricting vars") %>%
@@ -93,14 +93,14 @@ nodes <- nodes %>% mutate(label = id,
                           shape = "icon",
                             icon.color = case_when(type =="goal" ~ "black",
                                                    type !="goal" ~ "black"),
-                            icon.code = case_when(type == "condition" ~ "f43c", # chess board
-                                                  type == "goal" ~ "f24e",# scales  "f05b", # crosshairs
-                                                  type == "policy" ~ "f0e3",# gavel
-                                                  type == "value" ~ "f4be", # hand with heart
-                                                  type == "effect" ~ "f681", # data 
-                                                  type == "metric" ~ "f545", # ruler 
-                                                  TRUE ~ "f681"),
-                            icon.face = "FontAwesome",
+                            icon.code = case_when(type == "condition" ~ "f205", # chess board
+                                                  type == "goal" ~ "f24e", # scale  "f05b", # crosshairs
+                                                  type == "policy" ~ "f0e3", # gavel
+                                                  type == "value" ~ "f004", # "f4be", # hand with heart
+                                                  type == "effect" ~ "f080", # "f681", # data 
+                                                  type == "metric" ~ "f1de",# "f548", # ruler 
+                                                  TRUE ~ "f0c8"), #square
+                            icon.face =  "'FontAwesome'",
                             icon.weight = "bold")
 
 # format edges
@@ -113,21 +113,20 @@ edges <- edges %>% mutate(
 
 
 # make directed graph
-p <- visNetwork(nodes=nodes, edges=edges, width = "100%") %>% 
+visNetwork(nodes=nodes, edges=edges, width = "100%") %>% 
   visEdges(width=5, color= edges$color, arrows = "to", arrowStrikethrough = F, smooth = T) %>%
   visNodes(scaling=list(min=40, max=50)) %>%
   visOptions(highlightNearest = list(enabled = T, degree = 1, hover = T)) %>%
   visInteraction(hover=TRUE, zoomView = TRUE) %>%
   #visHierarchicalLayout() %>% 
   visPhysics(solver = "forceAtlas2Based", forceAtlas2Based = list(gravitationalConstant = -50)) %>%
-  addFontAwesome() %>%
+  addFontAwesome(name = "font-awesome-visNetwork") %>%
 visLayout(randomSeed = 12) # to have always the same network  
 
 # save datasets to call in Shiny
 #save(nodes, file = here::here("dag", "nodes.RData"))
 #save(edges, file = here::here("dag", "edges.RData"))
 
-return(p)
 }
 ```
 
