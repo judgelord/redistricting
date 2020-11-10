@@ -26,6 +26,7 @@ library(tidyverse)
 library(visNetwork)
 library(igraph)
 library(googlesheets4)
+library(fontawesome)
 
 knitr::opts_chunk$set(echo = TRUE, 
                       cache = FALSE, 
@@ -91,13 +92,13 @@ nodes <- nodes %>% mutate(label = id,
                           # FontAwesome.com shapes for fun
                           shape = "icon",
                             icon.color = case_when(type =="goal" ~ "black",
-                                                   type !="goal" ~ "lightblue"),
-                            icon.code = case_when(type == "condition" ~ "f681",
-                                                  type == "goal" ~ "f05b",
-                                                  type == "policy" ~ "f0e3",
-                                                  type == "value" ~ "f4be",
-                                                  type == "effect" ~ "f681",
-                                                  type == "metric" ~ "f545",
+                                                   type !="goal" ~ "black"),
+                            icon.code = case_when(type == "condition" ~ "f43c", # chess board
+                                                  type == "goal" ~ "f24e",# scales  "f05b", # crosshairs
+                                                  type == "policy" ~ "f0e3",# gavel
+                                                  type == "value" ~ "f4be", # hand with heart
+                                                  type == "effect" ~ "f681", # data 
+                                                  type == "metric" ~ "f545", # ruler 
                                                   TRUE ~ "f681"),
                             icon.face = "FontAwesome",
                             icon.weight = "bold")
@@ -113,7 +114,7 @@ edges <- edges %>% mutate(
 
 # make directed graph
 p <- visNetwork(nodes=nodes, edges=edges, width = "100%") %>% 
-  visEdges(width=5, color= edges$color, arrows = "to", smooth = T) %>%
+  visEdges(width=5, color= edges$color, arrows = "to", arrowStrikethrough = F, smooth = T) %>%
   visNodes(scaling=list(min=40, max=50)) %>%
   visOptions(highlightNearest = list(enabled = T, degree = 1, hover = T)) %>%
   visInteraction(hover=TRUE, zoomView = TRUE) %>%

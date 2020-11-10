@@ -30,16 +30,16 @@ NA,value - historical continuity,"heterogeneously correlated (depending on goals
 NA,goal - preserve communities of interest,increases,goal - communities preserved,NA,NA
 NA,goal - preserve municipal jurisdictions,increases,goal - communities preserved,NA,NA
 NA,value - historical continuity,heterogeneously correlated (depending on goals of past districting),metric - compactness,NA,NA
-NA,value - historical continuity,increases,goal - core retention,NA,NA
+NA,value - historical continuity,increases,metric - core retention,NA,NA
 NA,NA,NA,NA,NA,NA
 NA,value - historical continuity,heterogeneously correlated (depending on goals of past districting),goal - communities preserved,NA,NA
 NA,value - geographic continuity,heterogeneously correlated,metric - compactness,NA,NA
-NA,value - geographic continuity,heterogeneously correlated,goal - core retention,NA,NA
+NA,value - geographic continuity,heterogeneously correlated,metric - core retention,NA,NA
 NA,value - geographic continuity,heterogeneously correlated,goal - communities preserved,NA,NA
 NA,value - minority rights,parabolic,goal - proportional minority representation,NA,NA
 NA,goal - proportional minority representation,increases,goal - proportionality,NA,NA
 NA,value - community,increases,goal - communities preserved,NA,NA
-NA,goal - core retention,increases,effect - incumbent advantage,NA,NA
+NA,metric - core retention,increases,effect - incumbent advantage,NA,NA
 NA,policy - incumbent stays,increases,effect - incumbent advantage,NA,NA
 NA,effect - incumbent's constituents change,increases (but only meaningfully for already fairly competitive districts),goal - Number of competitive districts,Desposato & Petrocik,NA
 NA,condition - competitiveness (partisan balance),increases,effect - constituent service,Ashworth and Bueno de Mesquita 2005,NA
@@ -52,7 +52,7 @@ NA,goal - proportionality,increases,effect - House-Senate Delegation alignment,C
 NA,effect - House-Senate delegation alignment,decreases,policy - pork spending,Chen 2011,NA
 NA,effect - voters' fellow constituents change,decreases heterogeneously by race,effect - voter sense of place,Hayes & McKee 2011,NA
 NA,effect - voter sense of place,increases,effect - turnout,NA,NA
-NA,goal - core retention,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+NA,metric - core retention,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
 NA,goal - communities preserved,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
 NA,goal - Number of competitive districts,decreases,effect - electoral security,NA,NA
 NA,effect - electoral security,increases,effect - extremism,NA,NA
@@ -86,5 +86,5 @@ NA,effect - policy preferred by racial minorities,increases,effect - material be
 NA,NA,NA,NA,NA,NA
 NA,goal - incumbent safety,decreases,goal - partisan advantage,"Cain 1985, Wyrick 1991",NA
 NA,NA,NA,NA,NA,NA
-NA,NOT SURE HOW TO THINK ABOUT THIS AT THE STATE LEVEL,NA,NA,NA,NA
-NA,condition - proportion of minority voters (in a district),increases (outstanding question),effect - minority substantive representation,"Cameron et al. 1996, Shotts 2003, Handley et al. 1998, Bullock 1995, Overby & Cosgrove 1996, Sharpe & Garand 2001, Swain 1993, Overby & Cosgrove 1996, LeVeaux & Garand 2003",NA
+NA,NA,NA,NA,NA,NA
+NA,condition - proportion of minority voters (in a district),increases (outstanding question),effect - minority substantive representation,"Cameron et al. 1996, Shotts 2003, Handley et al. 1998, Bullock 1995, Overby & Cosgrove 1996, Sharpe & Garand 2001, Swain 1993, Overby & Cosgrove 1996, LeVeaux & Garand 2003",NOT SURE HOW TO THINK ABOUT THIS AT THE STATE LEVEL
