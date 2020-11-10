@@ -1,5 +1,5 @@
 ---
-title: "DAG"
+title: "Redistricting DAG"
 subtitle: 
 author:
 output:
@@ -15,7 +15,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-This “exploratory dag” pulls nodes and edges from [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q/edit#gid=578039899). We can force these nodes into a hierarchy, but it is messier. I should be able to make a shiny app version of this that will allow us to select which nodes we want out of the full set from the google sheet--this will allow us to do all of our substantive edits in the google sheet and let this app render it for us.
+This “exploratory DAG” pulls nodes and edges from [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q/edit#gid=578039899). We can force these nodes into a hierarchy, but it is messier. I should be able to make a shiny app version of this that will allow us to select subsets of nodes from the google sheet--this will allow us to do all of our substantive edits in the google sheet and let this app render it for us.
 
 ```{r, include=FALSE}
 # set working directory
