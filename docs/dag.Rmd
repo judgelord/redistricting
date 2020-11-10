@@ -61,7 +61,7 @@ nodes <- tibble(id = nodes %>% str_remove(".* - "),
 edges <- dag %>% transmute(
   from = from %>% str_remove(".* - "),
   to = to %>% str_remove(".* - "),
-  detail = paste(edge, mechanism, cites, sep = "<br>"), 
+  detail = paste(edge, mechanism, cites, sep = "<br>") %>% str_remove_all("NA"), 
   type = edge
 ) %>% 
   distinct()
