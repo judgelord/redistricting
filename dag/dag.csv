@@ -1,0 +1,24 @@
+core,from,edge,to,cites,mechanism
+T,metric - compactness,"Parabolic (but positive for partisan gerrymandered maps, maybe most maps?) for any geographically-concentrated community",goal - communities preserved,NA,NA
+T,metric - compactness,"Parabolic, but negative for most existing maps.
+Makes highly partisan maps more difficult to draw",goal - partisan advantage,NA,NA
+T,goal - Number of of competitive districts,increases (mean) but makes big swings possible (may increase variance),goal - proportionality,NA,"- Competitiveness increases variance in the proportionality of seats
+- Increasing certainty of proportional outcome means decreasing the competitiveness of districts"
+T,goal - proportionality,ensuring proportionally means few swing districts,goal - Number of of competitive districts,NA,proportionality is inverse to measures like wasted votes and the efficiency gap
+T,goal - Number of of competitive districts,"decreases if cor(party,community)>0",goal - communities preserved,NA,NA
+T,goal - partisan advantage,decreases,goal - proportionality,NA,A partisan gerrymander aims to diverge from proportionality
+T,goal - proportionality,decreases,goal - partisan advantage,NA,NA
+T,goal - proportionality,"increases in expectation if cor(party,community)>0",goal - communities preserved,NA,NA
+T,goal - communities preserved,"increases in expectation if cor(party,community)>0, but in practice, lumping enough members of come communities to secure a seat (e.g. a majority minority district) can be tricky depending on the dispersion of the population",goal - proportionality,NA,NA
+T,goal - partisan advantage,decreases,goal - Number of of competitive districts,NA,A partisan gerrymander aims to decrease the number of competitive district
+T,goal - Number of of competitive districts,decreases,goal - partisan advantage,NA,NA
+T,goal - partisan advantage,decreases overall (but heterogeneous and conditional on correlation between party and interest),goal - communities preserved,NA,"A partisan gerrymander aims to maximize ""minimally safe"" districts"
+T,goal - communities preserved,decreases overall (but heterogeneous and conditional on correlation between party and interest),goal - partisan advantage,NA,"- Conflicting in ""cracked""/""minimally safe"" districts
+- Aligned for packed districts"
+T,goal - communities preserved,?,policy - majority minority districts,NA,NA
+T,policy - majority minority districts,increases,goal - proportionality,NA,NA
+T,policy - majority minority districts,decreases,goal - Number of of competitive districts,NA,NA
+T,goal - Number of of competitive districts,increases,effect - legislator information seeking,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+T,effect - legislator information seeking,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA
+T,effect - legislator information about district,increases,effect - floor votes align with district preferences,"Butler, D and Nickerson, D 2011, Broockman and Skovron 2018, and Hertel-Fernandez et al. 2018",NA
+T,goal - communities preserved,increases,effect - legislator information about district,"spinning out Butler, Broockman, and Hertel-Fernandez",NA

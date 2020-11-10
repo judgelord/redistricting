@@ -1,0 +1,115 @@
+---
+title: "DAG"
+subtitle: 
+author:
+output:
+    # pdf_document:
+    #   toc: true
+    #   keep_tex: true
+    html_document:
+      highlight: zenburn
+      #toc: true
+      #toc_float: true
+      code_folding: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+# set working directory
+
+library(tidyverse)
+library(visNetwork)
+library(igraph)
+library(googlesheets4)
+
+knitr::opts_chunk$set(echo = TRUE, 
+                      cache = FALSE, 
+                      fig.width=8.5, 
+                      split = T,
+                      fig.align = 'center', 
+                      fig.path='figs/',
+                      warning=FALSE, 
+                      message=FALSE)
+```
+
+```{r}
+# refresh data from google sheet
+if(gs4_has_token()){
+
+ss <- googledrive::drive_get("redistricting vars") %>%
+  gs4_get()
+1
+1
+dag <- read_sheet(ss, "DAG") %>% filter(core == "T")
+write_csv(dag, here::here("dag", "dag.csv"))
+}
+
+# load data
+dag <- read.csv(here::here("dag", "dag.csv"))
+
+nodes <- c(dag$from,
+           dag$to)
+
+nodes <- tibble(id = nodes %>% str_remove(".* - "),
+                type = nodes %>% str_remove(" - .*")) %>% 
+  filter(!is.na(id)) %>%
+  distinct()
+
+edges <- dag %>% transmute(
+  from = from %>% str_remove(".* - "),
+  to = to %>% str_remove(".* - "),
+  detail = paste(edge, mechanism, cites, sep = "<br>"), 
+  type = edge
+) %>% 
+  distinct()
+
+
+
+# calculate betweeness in order to scale nodes
+graph <- igraph::graph.data.frame(edges, directed = T)
+degree_value <- degree(graph, mode = "in")
+nodes$icon.size <- degree_value[match(nodes$id, names(degree_value))] + 40
+
+# add attributes
+nodes <- nodes %>% mutate(label = id, 
+                          title = paste0("<p>", type, ": ", label,"</p>"),
+                          # levels in case we want Hierarchical Layout
+                          level = ifelse(type == "goal", 1:2, 3:4),
+                          # FontAwesome.com shapes for fun
+                          shape = "icon",
+                            icon.color = case_when(type =="goal" ~ "black",
+                                                   type !="goal" ~ "lightblue"),
+                            icon.code = case_when(type == "goal" ~ "f05b",
+                                                  type == "policy" ~ "f0e3",
+                                                  type == "value" ~ "f4be",
+                                                  type == "effect" ~ "f681",
+                                                  type == "metric" ~ "f545"),
+                            icon.face = "FontAwesome",
+                            icon.weight = "bold")
+
+# format edges
+edges <- edges %>% mutate(
+  title = paste0("<p>", detail, "</p>"),
+  #label = type,
+  color = ifelse(str_detect(type, "^increase"), "#036606", "#dbd9db"),
+  color = ifelse(str_detect(type, "^decrease"), "#f77272", color) ) 
+
+
+
+# make directed graph
+visNetwork(nodes=nodes, edges=edges, width = "100%") %>% 
+  visEdges(width=5, color= edges$color, arrows = "to", smooth = T) %>%
+  #visNodes(scaling=list(min=40, max=50)) %>%
+  visOptions(highlightNearest = list(enabled = T, degree = 1, hover = T)) %>%
+  #visInteraction(hover=TRUE, zoomView = TRUE) %>%
+  #visHierarchicalLayout() %>% 
+  visPhysics(solver = "forceAtlas2Based", forceAtlas2Based = list(gravitationalConstant = -50)) %>%
+  addFontAwesome() %>%
+visLayout(randomSeed = 12) # to have always the same network  
+
+
+# save datasets to call in Shiny
+save(nodes, file = here::here("dag", "nodes.RData"))
+save(edges, file = here::here("dag", "edges.RData"))
+```
