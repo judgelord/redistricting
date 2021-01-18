@@ -62,7 +62,7 @@ For example, NOMINATE scores.
 
 ### Floor speeches (representational style)
 
-Our preliminary analysis countying keywords in floor speeches is [here](https://judgelord.github.io/cr/scraper.html#Full_Text_Search).
+> Our preliminary analysis countying keywords in floor speeches is [here](https://judgelord.github.io/cr/scraper.html#Full_Text_Search).
 
 To see what comparing district partisanship to speeches will look like, see [this](https://judgelord.github.io/cr/speeches#Vote_share_data_from_MIT_Elections_Lab) comparison of district partisan ship to the *total number* of speeches. (There is no relationship between presidential vote share and the one's total number of speeches, but there may be in the *content* of those speeches.)
 
@@ -84,6 +84,10 @@ The relationship between district partisanship and the amount of partisan vitrio
 Another possible line of inquiry lies in assessing tradeoffs among the normative goals of districting. (See relationships among goals in the [exploratory DAG](https://judgelord.shinyapps.io/redistricting-lit/))
 
 For simplicity, assume a perfect correlation of "interest" and partisanship. (Interest and community are squishy concepts anyway.) Maximizing the goal of "preserving" "communities of interest" (by which we mean grouping communities of interest, even where they have previously been split) then results in maximizing the *difference* in two-party vote share. In a world without other constraints, maximizing the grouping of communities of interest would yield some districts that are all majority party and others that are all minority party. In the extreme, unconstrained world, grouping communities of interest into districts leads to stable districts that are always represented by the same party that enjoys an overwhelming majority in the district. These districts are never competitive in a general election but are presumably very competitive in primary elections. 
+
+## Extreme hypotheticals
+
+The following hypothetical outcomes each take one goal to the extreme. All have the same total number of majority and minority party voters, allocated differently across 15 districts, yielding a different number of seats for the majority party.
 
 ```{r tensions, fig.width=11}
 # imagined data maximizing interest coherence 
@@ -130,19 +134,19 @@ ggplot(d) +
 
 dplot(interest) + 
   labs(title = "Districting that maximizes interest alignment within districts",
-  y = str_c("Expected Majority Party Votes = ", sum(interest$majority_party_vote>50)))
+  y = str_c("Majority Party Vote Share \n Expected Seats = ", sum(interest$majority_party_vote>50)))
 
 dplot(competitive) + 
   labs(title = "Districting that maximizes the number of competitive districts\n (and thus proportionality, in expectation)",
-  y = str_c("Expected Majority Party Votes = 1 + (14*.5) = 8"))
+  y = str_c("Majority Party Vote Share \n Expected Seats = 1 + (14*.5) = 8"))
 
 dplot(majority) + 
   labs(title = "Districting that maximizes majority-party seats",
-  y = str_c("Expected Majority Party Votes = ", sum(majority$majority_party_vote>50))) 
+  y = str_c("Majority Party Vote Share \n Expected Seats = ", sum(majority$majority_party_vote>50))) 
 
 dplot(minority) + 
   labs(title = "Districting that maximizes minority-party seats",
-  y = str_c("Expected Majority Party Votes = ", sum(minority$majority_party_vote>50)))
+  y = str_c("Majority Party Vote Share \n Expected Seats = ", sum(minority$majority_party_vote>50)))
 ```
 
 
