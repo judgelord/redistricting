@@ -43,11 +43,47 @@ kablebox <- . %>%  knitr::kable() %>%
   scroll_box(height = "400px")
 ```
 
-In addition to brainstorming possible dependent and explanatory variables in [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q), this pages describes possible designs to study the effects of redistricting, starting with the most basic models.
+Building on possible dependent and explanatory variables compiled in [this google sheet](https://docs.google.com/spreadsheets/d/13S_p2AY05PzPvUkp4t8xNW6xbefntktaGo9JAtfXw1Q), this pages describes possible designs to study the effects of redistricting, starting with the most basic models.
 
-# Tensions among goals 
+# 1. Measuring representation by district characteristics
 
-For simplicity, assume a perfect correlation of "interest" and partisanship. (Interest and community are squishy concepts anyway.) Maximizing the goal of "preserving" "communities of interest" (by which we really mean, grouping communities of interest, even where they have previously been split) then results in maximizing the *difference* in two-party vote share. In a world without other constraints, maximizing the grouping of communities of interest would yield some districts that are all majority party and others that are all minority party. In the extreme, unconstrained world, grouping communities of interest into districts leads to stable districts that are always represented by the same party that enjoys an overwhelming majority in the district. These districts are never competitive in a general election but are presumably very competitive in primary elections. 
+As political scientists on the UW 2020 project, our comparative advantage is that our colleagues in other disciplines are creating and comparing alternative maps, both those that exist and hypothetical alternatives. For our purposes, these maps will come with two key types of information:
+
+1. district partisanship (led by Ken and Blake)
+1. measures of community (led by Song et al.)
+
+Measures of both district partisanship and community relate theoretically to measures of representation. If we can estimate relationships between district characteristics and representation for districts we observe, we can then estimate the quality of representation for hypothetical districts. Many kinds of representation may be of interest. The list below is incomplete and will grow as we develop measures of different forms of representation. 
+
+## Legislator behavior
+
+### Floor votes (substantive representation)
+
+For example, NOMINATE scores.
+
+### Floor speeches (representational style)
+
+Our preliminary analysis countying keywords in floor speeches is [here](https://judgelord.github.io/cr/scraper.html#Full_Text_Search).
+
+To see what comparing district partisanship to speeches will look like, see [this](https://judgelord.github.io/cr/speeches#Vote_share_data_from_MIT_Elections_Lab) comparison of district partisan ship to the *total number* of speeches. (There is no relationship between presidential vote share and the one's total number of speeches, but there may be in the *content* of those speeches.)
+
+![](../../Congressional records/cr/docs/figs/speeches_voteshare_pres-1.png)
+
+#### Talking about one's district
+
+The relationship between district partisanship and the number of references to one's district. 
+
+##### Partisan or bipartisan rhetoric
+
+The relationship between district partisanship and the amount bipartisan rhetoric.
+
+The relationship between district partisanship and the amount of partisan vitriol.
+
+
+# 2. Tensions among districting goals 
+
+Another possible line of inquiry lies in assessing tradeoffs among the normative goals of districting. (See relationships among goals in the [exploratory DAG](https://judgelord.shinyapps.io/redistricting-lit/))
+
+For simplicity, assume a perfect correlation of "interest" and partisanship. (Interest and community are squishy concepts anyway.) Maximizing the goal of "preserving" "communities of interest" (by which we mean grouping communities of interest, even where they have previously been split) then results in maximizing the *difference* in two-party vote share. In a world without other constraints, maximizing the grouping of communities of interest would yield some districts that are all majority party and others that are all minority party. In the extreme, unconstrained world, grouping communities of interest into districts leads to stable districts that are always represented by the same party that enjoys an overwhelming majority in the district. These districts are never competitive in a general election but are presumably very competitive in primary elections. 
 
 ```{r tensions, fig.width=11}
 # imagined data maximizing interest coherence 
@@ -257,7 +293,7 @@ t.test(x = d1 %>% filter(cracked) %>%
 
 ---
 
-## Are black voters in cracked distrcits less well represented? 
+## Are black voters in cracked districts less well represented? 
 
 Now let $y_1$ be a measure of representation of Black residents. 
 
