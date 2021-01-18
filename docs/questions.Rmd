@@ -62,7 +62,7 @@ For example, NOMINATE scores.
 
 ### Floor speeches (representational style)
 
-> Our preliminary analysis countying keywords in floor speeches is [here](https://judgelord.github.io/cr/scraper.html#Full_Text_Search).
+> Our preliminary analysis countying keywords in floor speeches is [here](https://judgelord.github.io/cr/scraper.html#Text_features).
 
 To see what comparing district partisanship to speeches will look like, see [this](https://judgelord.github.io/cr/speeches#Vote_share_data_from_MIT_Elections_Lab) comparison of district partisan ship to the *total number* of speeches. (There is no relationship between presidential vote share and the one's total number of speeches, but there may be in the *content* of those speeches.)
 
