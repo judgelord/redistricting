@@ -1,0 +1,171 @@
+---
+title: "Representation by District"
+subtitle: 
+author: ""
+output:
+  html_document:
+    highlight: zenburn
+    toc: true
+    toc_float: true
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r global.options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      cache = FALSE, 
+                      fig.width=8.5, 
+                      split = T,
+                      fig.align = 'center', 
+                      fig.path='figs/',
+                      warning=FALSE, 
+                      message=FALSE)
+
+
+library(tidyverse)
+library(rvest)
+library(readr)
+library(magrittr)
+library(tidytext)
+library(knitr)
+library(kableExtra)
+library(here)
+library(crayon)
+
+library(ggplot2); theme_set(theme_minimal())
+  options(
+    ggplot2.continuous.color = "viridis",
+    ggplot2.continuous.fill = "viridis"
+  )
+  scale_color_discrete <- function(...)
+    scale_color_viridis_d(...)
+  scale_fill_discrete <- function(...)
+    scale_fill_viridis_d(...)
+  
+kablebox <- . %>% 
+  head(100) %>%
+  knitr::kable() %>% 
+  kable_styling() %>% 
+  scroll_box(height = "400px")
+```
+
+# Congressional record parsed by speaker
+
+## Directory structure
+
+In the data/txt folder:
+```{r}
+cr_file <- list.files(here::here("data", "txt") %>% 
+                        str_replace("redistricting", "Congressional records/cr"),
+                      recursive = T) 
+
+cr_file %>% kablebox()
+```
+
+
+## Merge in voteview data 
+
+by legislator ICPSR id and congress
+
+```{r}
+d <- tibble(file = cr_file %>% str_remove(".*/"),
+            speech_id = cr_file %>% str_extract("000[0-9]*"),
+            icpsr = str_remove(cr_file, ".*-") %>% 
+              str_remove(".txt") %>% 
+              as.integer(),
+            date = str_extract(cr_file, "CREC-[0-9]*-[0-9]*-[0-9]*") %>% 
+              str_remove("CREC-") %>%
+              as.Date) 
+
+d %<>% filter(!is.na(icpsr))
+
+# get congress from year 
+d %<>% mutate(year = str_sub(date, 1,4) %>% as.integer()) # the 107th congress began in 2001
+
+# get congress from year 
+d %<>% mutate(congress = as.numeric(round((year - 2001.1)/2)) + 107) # the 107th congress began in 2001
+
+# Devin's members data (expanded from voteview)
+load(here("data", "members.Rdata"))
+
+d %<>% left_join(members)
+
+d %>% 
+  select(bioname, cqlabel, icpsr, file) %>% 
+  distinct() %>% 
+  kablebox()
+```
+
+---
+
+## Subset to Wisconsin House Reps
+```{r}
+# House members from WI
+d %<>% filter(state == "wisconsin",
+             chamber == "House")
+
+
+d %>% 
+  select(bioname, cqlabel, icpsr, file) %>% 
+  distinct() %>% 
+  kablebox()
+```
+
+
+### TODO
+
+- [ ] identify WI House members who were up for reelection in 2020
+
+- [ ] measure gregariousness (frequency of speeches)
+
+- [ ] measure *level* of attention to district (mentions of home state, district, etc.)
+
+- [ ] measure *ratio*/log odds of "my district" vs "my conscience" etc.
+
+# District characteristics 
+
+## Connectivity
+
+```{r}
+# facebook friend data
+fb <- read_csv(here::here("data", "WI_congress_facebook_sci_pop.txt"))  %>% 
+  mutate_all(as.integer)
+
+names(fb) %<>% str_remove("_C.*")
+
+# cell phone mobility data
+flow <- read_csv(here::here("data", "district_flows_safegraph.txt")) %>%
+  mutate(OD_Pairs = OD_Pairs %>% str_remove_all("\\(|\\)")) %>% 
+  separate(OD_Pairs, into = c("from", "to"), sep = ", ") %>% 
+  mutate_all(as.integer)
+
+names(flow) %<>% str_to_lower()
+
+c <- full_join(fb, flow)
+
+c %>% kablebox()
+```
+
+## Merge speeches and within-district connectivity
+```{r}
+within <- c %>% filter(from == to)
+
+
+dc <- d %>% left_join(within,
+                by = c("district_code" = "to")) %>% filter(!is.na(flow_count)) 
+
+# number of speeches
+dc %>% count(bioname, cqlabel, flow_count, facebook_sci, name = "speeches_n") %>% kablebox()
+```
+
+## Demographics
+
+TODO
+
+## Partisanship
+
+TODO
+
+
