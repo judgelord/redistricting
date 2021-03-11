@@ -4925,23 +4925,30 @@ MOORE, Gwendolynne S. (Gwen)
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a><span class="co"># pivot data</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>dem <span class="op">%&lt;&gt;%</span><span class="st"> </span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="op">!</span>NAME) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">state =</span> <span class="kw">str_remove</span>(NAME, <span class="st">&quot;.*, &quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_to_lower</span>(),</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>         <span class="dt">district_code =</span> <span class="kw">str_extract</span>(NAME, <span class="st">&quot;District [0-9]*&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a><span class="st">           </span><span class="kw">str_remove</span>(<span class="st">&quot;District &quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.numeric</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a><span class="st">  </span><span class="co"># drop non-values </span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">value =</span> <span class="kw">as.numeric</span>(value)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(value)) <span class="op">%&gt;%</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="st">  </span><span class="co">#join value names</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a><span class="st">  </span><span class="kw">left_join</span>(dem_names)</span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a><span class="co"># demographic variables</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a>dem <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>(type, measure, group) <span class="op">%&gt;%</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(NAME, GEO_ID) <span class="op">%&gt;%</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="kw">starts_with</span>(<span class="st">&quot;SF&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">state =</span> <span class="kw">str_remove</span>(NAME, <span class="st">&quot;.*, &quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_to_lower</span>(),</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>         <span class="dt">district_code =</span> <span class="kw">str_extract</span>(NAME, <span class="st">&quot;District [0-9]*&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true"></a><span class="st">           </span><span class="kw">str_remove</span>(<span class="st">&quot;District &quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.numeric</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true"></a><span class="st">  </span><span class="co"># drop non-values </span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">value =</span> <span class="kw">as.numeric</span>(value)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(value)) <span class="op">%&gt;%</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true"></a><span class="st">  </span><span class="co">#join value names</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true"></a><span class="st">  </span><span class="kw">left_join</span>(dem_names)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true"></a><span class="co"># demographic variables</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true"></a>dem <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>(type, measure, group) <span class="op">%&gt;%</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+GEO_ID
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+NAME
+</th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 type
 </th>
@@ -4956,6 +4963,12 @@ group
 <tbody>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -4966,6 +4979,12 @@ NA
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -4978,6 +4997,12 @@ Under 5 years
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -4988,6 +5013,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5000,6 +5031,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5010,6 +5047,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5022,6 +5065,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5032,6 +5081,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5044,6 +5099,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5054,6 +5115,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5066,6 +5133,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5076,6 +5149,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5088,6 +5167,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5098,6 +5183,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5110,6 +5201,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5120,6 +5217,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5132,6 +5235,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5142,6 +5251,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5154,6 +5269,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5164,6 +5285,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5176,6 +5303,12 @@ Median age (years)
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5186,6 +5319,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5198,6 +5337,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5208,6 +5353,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5220,6 +5371,12 @@ Total population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5230,6 +5387,12 @@ Total population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5242,6 +5405,12 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5252,6 +5421,12 @@ Under 5 years
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5264,6 +5439,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5274,6 +5455,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5286,6 +5473,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5296,6 +5489,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5308,6 +5507,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5318,6 +5523,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5330,6 +5541,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5340,6 +5557,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5352,6 +5575,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5362,6 +5591,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5374,6 +5609,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5384,6 +5625,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5396,6 +5643,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5406,6 +5659,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5418,6 +5677,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5428,6 +5693,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5440,6 +5711,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5450,6 +5727,12 @@ Median age (years)
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5462,6 +5745,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5472,6 +5761,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5484,6 +5779,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5495,6 +5796,12 @@ Male population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5505,6 +5812,12 @@ Male population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5517,6 +5830,12 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5527,6 +5846,12 @@ Under 5 years
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5539,6 +5864,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5549,6 +5880,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5561,6 +5898,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5571,6 +5914,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5583,6 +5932,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5593,6 +5948,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5605,6 +5966,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5615,6 +5982,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5627,6 +6000,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5637,6 +6016,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5649,6 +6034,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5659,6 +6050,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5671,6 +6068,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5681,6 +6084,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5693,6 +6102,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5703,6 +6118,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5715,6 +6136,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5725,6 +6152,12 @@ Median age (years)
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5737,6 +6170,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5747,6 +6186,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 SEX AND AGE
 </td>
@@ -5759,6 +6204,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5770,6 +6221,12 @@ Female population
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 SEX AND AGE
 </td>
 <td style="text-align:left;">
@@ -5780,6 +6237,12 @@ Female population
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RACE
 </td>
@@ -5791,6 +6254,12 @@ NA
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RACE
 </td>
@@ -5803,6 +6272,12 @@ One Race
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RACE
 </td>
 <td style="text-align:left;">
@@ -5813,6 +6288,12 @@ Two or More Races
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RACE
 </td>
@@ -5825,6 +6306,12 @@ White
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RACE
 </td>
 <td style="text-align:left;">
@@ -5835,6 +6322,12 @@ Black or African American
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RACE
 </td>
@@ -5847,6 +6340,12 @@ American Indian and Alaska Native
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RACE
 </td>
 <td style="text-align:left;">
@@ -5857,6 +6356,12 @@ Asian
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RACE
 </td>
@@ -5869,6 +6374,12 @@ Native Hawaiian and Other Pacific Islander
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RACE
 </td>
 <td style="text-align:left;">
@@ -5880,6 +6391,12 @@ Some Other Race
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HISPANIC OR LATINO
 </td>
 <td style="text-align:left;">
@@ -5890,6 +6407,12 @@ NA
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HISPANIC OR LATINO
 </td>
@@ -5902,6 +6425,12 @@ Hispanic or Latino (of any race)
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HISPANIC OR LATINO
 </td>
 <td style="text-align:left;">
@@ -5913,6 +6442,12 @@ Not Hispanic or Latino
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HISPANIC OR LATINO AND RACE
 </td>
 <td style="text-align:left;">
@@ -5923,6 +6458,12 @@ NA
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HISPANIC OR LATINO AND RACE
 </td>
@@ -5935,6 +6476,12 @@ Hispanic or Latino
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HISPANIC OR LATINO AND RACE
 </td>
 <td style="text-align:left;">
@@ -5946,6 +6493,12 @@ Not Hispanic or Latino
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RELATIONSHIP
 </td>
 <td style="text-align:left;">
@@ -5956,6 +6509,12 @@ NA
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 RELATIONSHIP
 </td>
@@ -5968,6 +6527,12 @@ In households
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 RELATIONSHIP
 </td>
 <td style="text-align:left;">
@@ -5978,6 +6543,12 @@ In group quarters
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
@@ -5990,6 +6561,12 @@ NA
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
 <td style="text-align:left;">
@@ -6000,6 +6577,12 @@ Family households (families) [7]
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
@@ -6012,6 +6595,12 @@ Nonfamily households [7]
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
 <td style="text-align:left;">
@@ -6022,6 +6611,12 @@ Households with individuals under 18 years
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
@@ -6034,6 +6629,12 @@ Households with individuals 65 years and over
 </tr>
 <tr>
 <td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
+<td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
 <td style="text-align:left;">
@@ -6044,6 +6645,12 @@ Average household size
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+5001500US4823
+</td>
+<td style="text-align:left;">
+Congressional District 23 (115th Congress), Texas
+</td>
 <td style="text-align:left;">
 HOUSEHOLDS BY TYPE
 </td>
@@ -8400,7 +9007,9049 @@ Percent
 </div>
 <div id="partisanship" class="section level2">
 <h2>Partisanship</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>partisanship &lt;-<span class="st"> </span><span class="kw">read_csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;2020_11_23_WI_WARD_PARTISANSHIP_SIMPLE.csv&quot;</span>)) <span class="co">#FIXME %&gt;% mutate(district_code = str_sub(GEO_ID, -2) %&gt;% as.integer() )</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>partisanship <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+GEOID
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Total18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep18Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem18Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth18Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep16
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem16
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth16
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Total16
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep16Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem16Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth16Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep14
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem14
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth14
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Total14
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep14Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem14Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth14Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep12
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem12
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth12
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Total12
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Rep12Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Dem12Pct
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Oth12Pct
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+55001002750001
+</td>
+<td style="text-align:right;">
+111.0000
+</td>
+<td style="text-align:right;">
+108.6667
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+223.0000
+</td>
+<td style="text-align:right;">
+0.4978
+</td>
+<td style="text-align:right;">
+0.4873
+</td>
+<td style="text-align:right;">
+0.0149
+</td>
+<td style="text-align:right;">
+121.5
+</td>
+<td style="text-align:right;">
+110.5
+</td>
+<td style="text-align:right;">
+19.5
+</td>
+<td style="text-align:right;">
+251.5
+</td>
+<td style="text-align:right;">
+0.4831
+</td>
+<td style="text-align:right;">
+0.4394
+</td>
+<td style="text-align:right;">
+0.0775
+</td>
+<td style="text-align:right;">
+73.3333
+</td>
+<td style="text-align:right;">
+99.3333
+</td>
+<td style="text-align:right;">
+9.6667
+</td>
+<td style="text-align:right;">
+182.3333
+</td>
+<td style="text-align:right;">
+0.4022
+</td>
+<td style="text-align:right;">
+0.5448
+</td>
+<td style="text-align:right;">
+0.0530
+</td>
+<td style="text-align:right;">
+98.3333
+</td>
+<td style="text-align:right;">
+140.0000
+</td>
+<td style="text-align:right;">
+11.6667
+</td>
+<td style="text-align:right;">
+250.0000
+</td>
+<td style="text-align:right;">
+0.3933
+</td>
+<td style="text-align:right;">
+0.5600
+</td>
+<td style="text-align:right;">
+0.0467
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001002750002
+</td>
+<td style="text-align:right;">
+109.3333
+</td>
+<td style="text-align:right;">
+107.0000
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+217.6667
+</td>
+<td style="text-align:right;">
+0.5023
+</td>
+<td style="text-align:right;">
+0.4916
+</td>
+<td style="text-align:right;">
+0.0061
+</td>
+<td style="text-align:right;">
+118.5
+</td>
+<td style="text-align:right;">
+108.0
+</td>
+<td style="text-align:right;">
+13.5
+</td>
+<td style="text-align:right;">
+240.0
+</td>
+<td style="text-align:right;">
+0.4938
+</td>
+<td style="text-align:right;">
+0.4500
+</td>
+<td style="text-align:right;">
+0.0562
+</td>
+<td style="text-align:right;">
+71.6667
+</td>
+<td style="text-align:right;">
+96.3333
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+174.0000
+</td>
+<td style="text-align:right;">
+0.4119
+</td>
+<td style="text-align:right;">
+0.5536
+</td>
+<td style="text-align:right;">
+0.0345
+</td>
+<td style="text-align:right;">
+91.3333
+</td>
+<td style="text-align:right;">
+132.6667
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+228.0000
+</td>
+<td style="text-align:right;">
+0.4006
+</td>
+<td style="text-align:right;">
+0.5819
+</td>
+<td style="text-align:right;">
+0.0175
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001002750003
+</td>
+<td style="text-align:right;">
+48.3333
+</td>
+<td style="text-align:right;">
+47.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+98.0000
+</td>
+<td style="text-align:right;">
+0.4932
+</td>
+<td style="text-align:right;">
+0.4864
+</td>
+<td style="text-align:right;">
+0.0204
+</td>
+<td style="text-align:right;">
+53.5
+</td>
+<td style="text-align:right;">
+48.0
+</td>
+<td style="text-align:right;">
+8.5
+</td>
+<td style="text-align:right;">
+110.0
+</td>
+<td style="text-align:right;">
+0.4864
+</td>
+<td style="text-align:right;">
+0.4364
+</td>
+<td style="text-align:right;">
+0.0773
+</td>
+<td style="text-align:right;">
+32.0000
+</td>
+<td style="text-align:right;">
+43.3333
+</td>
+<td style="text-align:right;">
+4.6667
+</td>
+<td style="text-align:right;">
+80.0000
+</td>
+<td style="text-align:right;">
+0.4000
+</td>
+<td style="text-align:right;">
+0.5417
+</td>
+<td style="text-align:right;">
+0.0583
+</td>
+<td style="text-align:right;">
+45.0000
+</td>
+<td style="text-align:right;">
+64.0000
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+111.3333
+</td>
+<td style="text-align:right;">
+0.4042
+</td>
+<td style="text-align:right;">
+0.5749
+</td>
+<td style="text-align:right;">
+0.0210
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001002750004
+</td>
+<td style="text-align:right;">
+60.6667
+</td>
+<td style="text-align:right;">
+59.3333
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+120.3333
+</td>
+<td style="text-align:right;">
+0.5042
+</td>
+<td style="text-align:right;">
+0.4931
+</td>
+<td style="text-align:right;">
+0.0028
+</td>
+<td style="text-align:right;">
+66.5
+</td>
+<td style="text-align:right;">
+60.5
+</td>
+<td style="text-align:right;">
+7.5
+</td>
+<td style="text-align:right;">
+134.5
+</td>
+<td style="text-align:right;">
+0.4944
+</td>
+<td style="text-align:right;">
+0.4498
+</td>
+<td style="text-align:right;">
+0.0558
+</td>
+<td style="text-align:right;">
+39.6667
+</td>
+<td style="text-align:right;">
+54.0000
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+97.0000
+</td>
+<td style="text-align:right;">
+0.4089
+</td>
+<td style="text-align:right;">
+0.5567
+</td>
+<td style="text-align:right;">
+0.0344
+</td>
+<td style="text-align:right;">
+55.0000
+</td>
+<td style="text-align:right;">
+77.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+134.6667
+</td>
+<td style="text-align:right;">
+0.4084
+</td>
+<td style="text-align:right;">
+0.5767
+</td>
+<td style="text-align:right;">
+0.0149
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001003000001
+</td>
+<td style="text-align:right;">
+224.6667
+</td>
+<td style="text-align:right;">
+170.0000
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+398.6667
+</td>
+<td style="text-align:right;">
+0.5635
+</td>
+<td style="text-align:right;">
+0.4264
+</td>
+<td style="text-align:right;">
+0.0100
+</td>
+<td style="text-align:right;">
+235.5
+</td>
+<td style="text-align:right;">
+151.0
+</td>
+<td style="text-align:right;">
+22.5
+</td>
+<td style="text-align:right;">
+409.0
+</td>
+<td style="text-align:right;">
+0.5758
+</td>
+<td style="text-align:right;">
+0.3692
+</td>
+<td style="text-align:right;">
+0.0550
+</td>
+<td style="text-align:right;">
+151.6667
+</td>
+<td style="text-align:right;">
+155.0000
+</td>
+<td style="text-align:right;">
+14.3333
+</td>
+<td style="text-align:right;">
+321.0000
+</td>
+<td style="text-align:right;">
+0.4725
+</td>
+<td style="text-align:right;">
+0.4829
+</td>
+<td style="text-align:right;">
+0.0447
+</td>
+<td style="text-align:right;">
+182.0000
+</td>
+<td style="text-align:right;">
+210.0000
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+397.3333
+</td>
+<td style="text-align:right;">
+0.4581
+</td>
+<td style="text-align:right;">
+0.5285
+</td>
+<td style="text-align:right;">
+0.0134
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001003000002
+</td>
+<td style="text-align:right;">
+82.6667
+</td>
+<td style="text-align:right;">
+63.0000
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+148.0000
+</td>
+<td style="text-align:right;">
+0.5586
+</td>
+<td style="text-align:right;">
+0.4257
+</td>
+<td style="text-align:right;">
+0.0158
+</td>
+<td style="text-align:right;">
+87.0
+</td>
+<td style="text-align:right;">
+56.0
+</td>
+<td style="text-align:right;">
+10.0
+</td>
+<td style="text-align:right;">
+153.0
+</td>
+<td style="text-align:right;">
+0.5686
+</td>
+<td style="text-align:right;">
+0.3660
+</td>
+<td style="text-align:right;">
+0.0654
+</td>
+<td style="text-align:right;">
+56.3333
+</td>
+<td style="text-align:right;">
+57.6667
+</td>
+<td style="text-align:right;">
+6.3333
+</td>
+<td style="text-align:right;">
+120.3333
+</td>
+<td style="text-align:right;">
+0.4681
+</td>
+<td style="text-align:right;">
+0.4792
+</td>
+<td style="text-align:right;">
+0.0526
+</td>
+<td style="text-align:right;">
+63.3333
+</td>
+<td style="text-align:right;">
+72.3333
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+139.6667
+</td>
+<td style="text-align:right;">
+0.4535
+</td>
+<td style="text-align:right;">
+0.5179
+</td>
+<td style="text-align:right;">
+0.0286
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001003000003
+</td>
+<td style="text-align:right;">
+27.3333
+</td>
+<td style="text-align:right;">
+20.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+48.0000
+</td>
+<td style="text-align:right;">
+0.5694
+</td>
+<td style="text-align:right;">
+0.4306
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+29.0
+</td>
+<td style="text-align:right;">
+18.5
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+49.0
+</td>
+<td style="text-align:right;">
+0.5918
+</td>
+<td style="text-align:right;">
+0.3776
+</td>
+<td style="text-align:right;">
+0.0306
+</td>
+<td style="text-align:right;">
+18.6667
+</td>
+<td style="text-align:right;">
+18.6667
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+38.0000
+</td>
+<td style="text-align:right;">
+0.4912
+</td>
+<td style="text-align:right;">
+0.4912
+</td>
+<td style="text-align:right;">
+0.0175
+</td>
+<td style="text-align:right;">
+24.6667
+</td>
+<td style="text-align:right;">
+28.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+52.6667
+</td>
+<td style="text-align:right;">
+0.4684
+</td>
+<td style="text-align:right;">
+0.5316
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001073000001
+</td>
+<td style="text-align:right;">
+83.0000
+</td>
+<td style="text-align:right;">
+60.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+145.0000
+</td>
+<td style="text-align:right;">
+0.5724
+</td>
+<td style="text-align:right;">
+0.4184
+</td>
+<td style="text-align:right;">
+0.0092
+</td>
+<td style="text-align:right;">
+93.0
+</td>
+<td style="text-align:right;">
+60.5
+</td>
+<td style="text-align:right;">
+8.5
+</td>
+<td style="text-align:right;">
+162.0
+</td>
+<td style="text-align:right;">
+0.5741
+</td>
+<td style="text-align:right;">
+0.3735
+</td>
+<td style="text-align:right;">
+0.0525
+</td>
+<td style="text-align:right;">
+59.3333
+</td>
+<td style="text-align:right;">
+63.3333
+</td>
+<td style="text-align:right;">
+6.6667
+</td>
+<td style="text-align:right;">
+129.3333
+</td>
+<td style="text-align:right;">
+0.4588
+</td>
+<td style="text-align:right;">
+0.4897
+</td>
+<td style="text-align:right;">
+0.0515
+</td>
+<td style="text-align:right;">
+69.6667
+</td>
+<td style="text-align:right;">
+83.3333
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+157.3333
+</td>
+<td style="text-align:right;">
+0.4428
+</td>
+<td style="text-align:right;">
+0.5297
+</td>
+<td style="text-align:right;">
+0.0275
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001073000002
+</td>
+<td style="text-align:right;">
+163.3333
+</td>
+<td style="text-align:right;">
+120.0000
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+287.6667
+</td>
+<td style="text-align:right;">
+0.5678
+</td>
+<td style="text-align:right;">
+0.4171
+</td>
+<td style="text-align:right;">
+0.0151
+</td>
+<td style="text-align:right;">
+182.5
+</td>
+<td style="text-align:right;">
+118.5
+</td>
+<td style="text-align:right;">
+19.5
+</td>
+<td style="text-align:right;">
+320.5
+</td>
+<td style="text-align:right;">
+0.5694
+</td>
+<td style="text-align:right;">
+0.3697
+</td>
+<td style="text-align:right;">
+0.0608
+</td>
+<td style="text-align:right;">
+118.3333
+</td>
+<td style="text-align:right;">
+125.6667
+</td>
+<td style="text-align:right;">
+16.0000
+</td>
+<td style="text-align:right;">
+260.0000
+</td>
+<td style="text-align:right;">
+0.4551
+</td>
+<td style="text-align:right;">
+0.4833
+</td>
+<td style="text-align:right;">
+0.0615
+</td>
+<td style="text-align:right;">
+131.6667
+</td>
+<td style="text-align:right;">
+160.3333
+</td>
+<td style="text-align:right;">
+8.6667
+</td>
+<td style="text-align:right;">
+300.6667
+</td>
+<td style="text-align:right;">
+0.4379
+</td>
+<td style="text-align:right;">
+0.5333
+</td>
+<td style="text-align:right;">
+0.0288
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001160750001
+</td>
+<td style="text-align:right;">
+58.0000
+</td>
+<td style="text-align:right;">
+45.0000
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+103.6667
+</td>
+<td style="text-align:right;">
+0.5595
+</td>
+<td style="text-align:right;">
+0.4341
+</td>
+<td style="text-align:right;">
+0.0064
+</td>
+<td style="text-align:right;">
+85.0
+</td>
+<td style="text-align:right;">
+40.5
+</td>
+<td style="text-align:right;">
+3.5
+</td>
+<td style="text-align:right;">
+129.0
+</td>
+<td style="text-align:right;">
+0.6589
+</td>
+<td style="text-align:right;">
+0.3140
+</td>
+<td style="text-align:right;">
+0.0271
+</td>
+<td style="text-align:right;">
+57.3333
+</td>
+<td style="text-align:right;">
+41.0000
+</td>
+<td style="text-align:right;">
+3.6667
+</td>
+<td style="text-align:right;">
+102.0000
+</td>
+<td style="text-align:right;">
+0.5621
+</td>
+<td style="text-align:right;">
+0.4020
+</td>
+<td style="text-align:right;">
+0.0359
+</td>
+<td style="text-align:right;">
+54.3333
+</td>
+<td style="text-align:right;">
+59.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+116.0000
+</td>
+<td style="text-align:right;">
+0.4684
+</td>
+<td style="text-align:right;">
+0.5115
+</td>
+<td style="text-align:right;">
+0.0201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001195750001
+</td>
+<td style="text-align:right;">
+89.6667
+</td>
+<td style="text-align:right;">
+93.0000
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+185.0000
+</td>
+<td style="text-align:right;">
+0.4847
+</td>
+<td style="text-align:right;">
+0.5027
+</td>
+<td style="text-align:right;">
+0.0126
+</td>
+<td style="text-align:right;">
+118.5
+</td>
+<td style="text-align:right;">
+83.0
+</td>
+<td style="text-align:right;">
+11.5
+</td>
+<td style="text-align:right;">
+213.0
+</td>
+<td style="text-align:right;">
+0.5563
+</td>
+<td style="text-align:right;">
+0.3897
+</td>
+<td style="text-align:right;">
+0.0540
+</td>
+<td style="text-align:right;">
+84.3333
+</td>
+<td style="text-align:right;">
+77.3333
+</td>
+<td style="text-align:right;">
+7.3333
+</td>
+<td style="text-align:right;">
+169.0000
+</td>
+<td style="text-align:right;">
+0.4990
+</td>
+<td style="text-align:right;">
+0.4576
+</td>
+<td style="text-align:right;">
+0.0434
+</td>
+<td style="text-align:right;">
+106.3333
+</td>
+<td style="text-align:right;">
+98.3333
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+208.0000
+</td>
+<td style="text-align:right;">
+0.5112
+</td>
+<td style="text-align:right;">
+0.4728
+</td>
+<td style="text-align:right;">
+0.0160
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001195750002
+</td>
+<td style="text-align:right;">
+216.3333
+</td>
+<td style="text-align:right;">
+225.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+444.0000
+</td>
+<td style="text-align:right;">
+0.4872
+</td>
+<td style="text-align:right;">
+0.5075
+</td>
+<td style="text-align:right;">
+0.0053
+</td>
+<td style="text-align:right;">
+287.0
+</td>
+<td style="text-align:right;">
+200.5
+</td>
+<td style="text-align:right;">
+23.5
+</td>
+<td style="text-align:right;">
+511.0
+</td>
+<td style="text-align:right;">
+0.5616
+</td>
+<td style="text-align:right;">
+0.3924
+</td>
+<td style="text-align:right;">
+0.0460
+</td>
+<td style="text-align:right;">
+204.0000
+</td>
+<td style="text-align:right;">
+187.0000
+</td>
+<td style="text-align:right;">
+15.0000
+</td>
+<td style="text-align:right;">
+406.0000
+</td>
+<td style="text-align:right;">
+0.5025
+</td>
+<td style="text-align:right;">
+0.4606
+</td>
+<td style="text-align:right;">
+0.0369
+</td>
+<td style="text-align:right;">
+249.6667
+</td>
+<td style="text-align:right;">
+230.0000
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+484.0000
+</td>
+<td style="text-align:right;">
+0.5158
+</td>
+<td style="text-align:right;">
+0.4752
+</td>
+<td style="text-align:right;">
+0.0090
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001195750003
+</td>
+<td style="text-align:right;">
+39.3333
+</td>
+<td style="text-align:right;">
+41.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+80.3333
+</td>
+<td style="text-align:right;">
+0.4896
+</td>
+<td style="text-align:right;">
+0.5104
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+52.0
+</td>
+<td style="text-align:right;">
+36.5
+</td>
+<td style="text-align:right;">
+3.5
+</td>
+<td style="text-align:right;">
+92.0
+</td>
+<td style="text-align:right;">
+0.5652
+</td>
+<td style="text-align:right;">
+0.3967
+</td>
+<td style="text-align:right;">
+0.0380
+</td>
+<td style="text-align:right;">
+37.0000
+</td>
+<td style="text-align:right;">
+33.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+72.6667
+</td>
+<td style="text-align:right;">
+0.5092
+</td>
+<td style="text-align:right;">
+0.4633
+</td>
+<td style="text-align:right;">
+0.0275
+</td>
+<td style="text-align:right;">
+46.0000
+</td>
+<td style="text-align:right;">
+42.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+88.3333
+</td>
+<td style="text-align:right;">
+0.5208
+</td>
+<td style="text-align:right;">
+0.4792
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001220000001
+</td>
+<td style="text-align:right;">
+142.0000
+</td>
+<td style="text-align:right;">
+104.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+248.6667
+</td>
+<td style="text-align:right;">
+0.5710
+</td>
+<td style="text-align:right;">
+0.4196
+</td>
+<td style="text-align:right;">
+0.0094
+</td>
+<td style="text-align:right;">
+171.5
+</td>
+<td style="text-align:right;">
+96.5
+</td>
+<td style="text-align:right;">
+12.0
+</td>
+<td style="text-align:right;">
+280.0
+</td>
+<td style="text-align:right;">
+0.6125
+</td>
+<td style="text-align:right;">
+0.3446
+</td>
+<td style="text-align:right;">
+0.0429
+</td>
+<td style="text-align:right;">
+100.0000
+</td>
+<td style="text-align:right;">
+92.0000
+</td>
+<td style="text-align:right;">
+12.6667
+</td>
+<td style="text-align:right;">
+204.6667
+</td>
+<td style="text-align:right;">
+0.4886
+</td>
+<td style="text-align:right;">
+0.4495
+</td>
+<td style="text-align:right;">
+0.0619
+</td>
+<td style="text-align:right;">
+124.0000
+</td>
+<td style="text-align:right;">
+128.0000
+</td>
+<td style="text-align:right;">
+6.3333
+</td>
+<td style="text-align:right;">
+258.3333
+</td>
+<td style="text-align:right;">
+0.4800
+</td>
+<td style="text-align:right;">
+0.4955
+</td>
+<td style="text-align:right;">
+0.0245
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001220000002
+</td>
+<td style="text-align:right;">
+121.0000
+</td>
+<td style="text-align:right;">
+88.6667
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+210.3333
+</td>
+<td style="text-align:right;">
+0.5753
+</td>
+<td style="text-align:right;">
+0.4216
+</td>
+<td style="text-align:right;">
+0.0032
+</td>
+<td style="text-align:right;">
+146.5
+</td>
+<td style="text-align:right;">
+82.5
+</td>
+<td style="text-align:right;">
+7.0
+</td>
+<td style="text-align:right;">
+236.0
+</td>
+<td style="text-align:right;">
+0.6208
+</td>
+<td style="text-align:right;">
+0.3496
+</td>
+<td style="text-align:right;">
+0.0297
+</td>
+<td style="text-align:right;">
+85.3333
+</td>
+<td style="text-align:right;">
+77.6667
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+172.0000
+</td>
+<td style="text-align:right;">
+0.4961
+</td>
+<td style="text-align:right;">
+0.4516
+</td>
+<td style="text-align:right;">
+0.0523
+</td>
+<td style="text-align:right;">
+101.0000
+</td>
+<td style="text-align:right;">
+105.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+207.0000
+</td>
+<td style="text-align:right;">
+0.4879
+</td>
+<td style="text-align:right;">
+0.5072
+</td>
+<td style="text-align:right;">
+0.0048
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001279500001
+</td>
+<td style="text-align:right;">
+128.0000
+</td>
+<td style="text-align:right;">
+120.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+249.0000
+</td>
+<td style="text-align:right;">
+0.5141
+</td>
+<td style="text-align:right;">
+0.4819
+</td>
+<td style="text-align:right;">
+0.0040
+</td>
+<td style="text-align:right;">
+141.5
+</td>
+<td style="text-align:right;">
+120.0
+</td>
+<td style="text-align:right;">
+17.0
+</td>
+<td style="text-align:right;">
+278.5
+</td>
+<td style="text-align:right;">
+0.5081
+</td>
+<td style="text-align:right;">
+0.4309
+</td>
+<td style="text-align:right;">
+0.0610
+</td>
+<td style="text-align:right;">
+82.0000
+</td>
+<td style="text-align:right;">
+115.3333
+</td>
+<td style="text-align:right;">
+10.0000
+</td>
+<td style="text-align:right;">
+207.3333
+</td>
+<td style="text-align:right;">
+0.3955
+</td>
+<td style="text-align:right;">
+0.5563
+</td>
+<td style="text-align:right;">
+0.0482
+</td>
+<td style="text-align:right;">
+110.3333
+</td>
+<td style="text-align:right;">
+155.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+268.0000
+</td>
+<td style="text-align:right;">
+0.4117
+</td>
+<td style="text-align:right;">
+0.5808
+</td>
+<td style="text-align:right;">
+0.0075
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001376250001
+</td>
+<td style="text-align:right;">
+136.3333
+</td>
+<td style="text-align:right;">
+118.6667
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+257.6667
+</td>
+<td style="text-align:right;">
+0.5291
+</td>
+<td style="text-align:right;">
+0.4605
+</td>
+<td style="text-align:right;">
+0.0103
+</td>
+<td style="text-align:right;">
+150.0
+</td>
+<td style="text-align:right;">
+116.5
+</td>
+<td style="text-align:right;">
+13.5
+</td>
+<td style="text-align:right;">
+280.0
+</td>
+<td style="text-align:right;">
+0.5357
+</td>
+<td style="text-align:right;">
+0.4161
+</td>
+<td style="text-align:right;">
+0.0482
+</td>
+<td style="text-align:right;">
+109.3333
+</td>
+<td style="text-align:right;">
+105.0000
+</td>
+<td style="text-align:right;">
+10.3333
+</td>
+<td style="text-align:right;">
+224.6667
+</td>
+<td style="text-align:right;">
+0.4866
+</td>
+<td style="text-align:right;">
+0.4674
+</td>
+<td style="text-align:right;">
+0.0460
+</td>
+<td style="text-align:right;">
+130.0000
+</td>
+<td style="text-align:right;">
+134.3333
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+268.6667
+</td>
+<td style="text-align:right;">
+0.4839
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.0161
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001376250002
+</td>
+<td style="text-align:right;">
+140.3333
+</td>
+<td style="text-align:right;">
+122.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+264.0000
+</td>
+<td style="text-align:right;">
+0.5316
+</td>
+<td style="text-align:right;">
+0.4621
+</td>
+<td style="text-align:right;">
+0.0063
+</td>
+<td style="text-align:right;">
+154.0
+</td>
+<td style="text-align:right;">
+119.5
+</td>
+<td style="text-align:right;">
+11.0
+</td>
+<td style="text-align:right;">
+284.5
+</td>
+<td style="text-align:right;">
+0.5413
+</td>
+<td style="text-align:right;">
+0.4200
+</td>
+<td style="text-align:right;">
+0.0387
+</td>
+<td style="text-align:right;">
+112.6667
+</td>
+<td style="text-align:right;">
+108.3333
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+230.0000
+</td>
+<td style="text-align:right;">
+0.4899
+</td>
+<td style="text-align:right;">
+0.4710
+</td>
+<td style="text-align:right;">
+0.0391
+</td>
+<td style="text-align:right;">
+128.3333
+</td>
+<td style="text-align:right;">
+135.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+265.3333
+</td>
+<td style="text-align:right;">
+0.4837
+</td>
+<td style="text-align:right;">
+0.5101
+</td>
+<td style="text-align:right;">
+0.0063
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001434250001
+</td>
+<td style="text-align:right;">
+106.3333
+</td>
+<td style="text-align:right;">
+24.3333
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+131.0000
+</td>
+<td style="text-align:right;">
+0.8117
+</td>
+<td style="text-align:right;">
+0.1858
+</td>
+<td style="text-align:right;">
+0.0025
+</td>
+<td style="text-align:right;">
+108.5
+</td>
+<td style="text-align:right;">
+25.0
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+136.5
+</td>
+<td style="text-align:right;">
+0.7949
+</td>
+<td style="text-align:right;">
+0.1832
+</td>
+<td style="text-align:right;">
+0.0220
+</td>
+<td style="text-align:right;">
+80.0000
+</td>
+<td style="text-align:right;">
+31.0000
+</td>
+<td style="text-align:right;">
+5.0000
+</td>
+<td style="text-align:right;">
+116.0000
+</td>
+<td style="text-align:right;">
+0.6897
+</td>
+<td style="text-align:right;">
+0.2672
+</td>
+<td style="text-align:right;">
+0.0431
+</td>
+<td style="text-align:right;">
+98.6667
+</td>
+<td style="text-align:right;">
+40.0000
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+141.3333
+</td>
+<td style="text-align:right;">
+0.6981
+</td>
+<td style="text-align:right;">
+0.2830
+</td>
+<td style="text-align:right;">
+0.0189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001442500001
+</td>
+<td style="text-align:right;">
+76.3333
+</td>
+<td style="text-align:right;">
+76.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+154.0000
+</td>
+<td style="text-align:right;">
+0.4957
+</td>
+<td style="text-align:right;">
+0.4978
+</td>
+<td style="text-align:right;">
+0.0065
+</td>
+<td style="text-align:right;">
+98.0
+</td>
+<td style="text-align:right;">
+73.0
+</td>
+<td style="text-align:right;">
+9.5
+</td>
+<td style="text-align:right;">
+180.5
+</td>
+<td style="text-align:right;">
+0.5429
+</td>
+<td style="text-align:right;">
+0.4044
+</td>
+<td style="text-align:right;">
+0.0526
+</td>
+<td style="text-align:right;">
+66.3333
+</td>
+<td style="text-align:right;">
+69.0000
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+140.6667
+</td>
+<td style="text-align:right;">
+0.4716
+</td>
+<td style="text-align:right;">
+0.4905
+</td>
+<td style="text-align:right;">
+0.0379
+</td>
+<td style="text-align:right;">
+72.6667
+</td>
+<td style="text-align:right;">
+76.6667
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+153.6667
+</td>
+<td style="text-align:right;">
+0.4729
+</td>
+<td style="text-align:right;">
+0.4989
+</td>
+<td style="text-align:right;">
+0.0282
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001537250001
+</td>
+<td style="text-align:right;">
+131.0000
+</td>
+<td style="text-align:right;">
+99.6667
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+231.0000
+</td>
+<td style="text-align:right;">
+0.5671
+</td>
+<td style="text-align:right;">
+0.4315
+</td>
+<td style="text-align:right;">
+0.0014
+</td>
+<td style="text-align:right;">
+124.0
+</td>
+<td style="text-align:right;">
+102.0
+</td>
+<td style="text-align:right;">
+9.0
+</td>
+<td style="text-align:right;">
+235.0
+</td>
+<td style="text-align:right;">
+0.5277
+</td>
+<td style="text-align:right;">
+0.4340
+</td>
+<td style="text-align:right;">
+0.0383
+</td>
+<td style="text-align:right;">
+101.3333
+</td>
+<td style="text-align:right;">
+105.0000
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+212.0000
+</td>
+<td style="text-align:right;">
+0.4780
+</td>
+<td style="text-align:right;">
+0.4953
+</td>
+<td style="text-align:right;">
+0.0267
+</td>
+<td style="text-align:right;">
+122.6667
+</td>
+<td style="text-align:right;">
+127.0000
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+252.3333
+</td>
+<td style="text-align:right;">
+0.4861
+</td>
+<td style="text-align:right;">
+0.5033
+</td>
+<td style="text-align:right;">
+0.0106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001565250001
+</td>
+<td style="text-align:right;">
+40.3333
+</td>
+<td style="text-align:right;">
+33.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+74.0000
+</td>
+<td style="text-align:right;">
+0.5450
+</td>
+<td style="text-align:right;">
+0.4550
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+46.0
+</td>
+<td style="text-align:right;">
+31.5
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+80.0
+</td>
+<td style="text-align:right;">
+0.5750
+</td>
+<td style="text-align:right;">
+0.3938
+</td>
+<td style="text-align:right;">
+0.0312
+</td>
+<td style="text-align:right;">
+26.3333
+</td>
+<td style="text-align:right;">
+31.0000
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+60.0000
+</td>
+<td style="text-align:right;">
+0.4389
+</td>
+<td style="text-align:right;">
+0.5167
+</td>
+<td style="text-align:right;">
+0.0444
+</td>
+<td style="text-align:right;">
+28.6667
+</td>
+<td style="text-align:right;">
+39.3333
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+68.6667
+</td>
+<td style="text-align:right;">
+0.4175
+</td>
+<td style="text-align:right;">
+0.5728
+</td>
+<td style="text-align:right;">
+0.0097
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001565250002
+</td>
+<td style="text-align:right;">
+38.3333
+</td>
+<td style="text-align:right;">
+32.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+72.3333
+</td>
+<td style="text-align:right;">
+0.5300
+</td>
+<td style="text-align:right;">
+0.4470
+</td>
+<td style="text-align:right;">
+0.0230
+</td>
+<td style="text-align:right;">
+44.5
+</td>
+<td style="text-align:right;">
+31.0
+</td>
+<td style="text-align:right;">
+4.5
+</td>
+<td style="text-align:right;">
+80.0
+</td>
+<td style="text-align:right;">
+0.5562
+</td>
+<td style="text-align:right;">
+0.3875
+</td>
+<td style="text-align:right;">
+0.0562
+</td>
+<td style="text-align:right;">
+26.3333
+</td>
+<td style="text-align:right;">
+30.0000
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+62.0000
+</td>
+<td style="text-align:right;">
+0.4247
+</td>
+<td style="text-align:right;">
+0.4839
+</td>
+<td style="text-align:right;">
+0.0914
+</td>
+<td style="text-align:right;">
+27.6667
+</td>
+<td style="text-align:right;">
+37.6667
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+68.0000
+</td>
+<td style="text-align:right;">
+0.4069
+</td>
+<td style="text-align:right;">
+0.5539
+</td>
+<td style="text-align:right;">
+0.0392
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001565250003
+</td>
+<td style="text-align:right;">
+116.6667
+</td>
+<td style="text-align:right;">
+98.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+216.6667
+</td>
+<td style="text-align:right;">
+0.5385
+</td>
+<td style="text-align:right;">
+0.4554
+</td>
+<td style="text-align:right;">
+0.0062
+</td>
+<td style="text-align:right;">
+134.0
+</td>
+<td style="text-align:right;">
+92.5
+</td>
+<td style="text-align:right;">
+9.0
+</td>
+<td style="text-align:right;">
+235.5
+</td>
+<td style="text-align:right;">
+0.5690
+</td>
+<td style="text-align:right;">
+0.3928
+</td>
+<td style="text-align:right;">
+0.0382
+</td>
+<td style="text-align:right;">
+76.0000
+</td>
+<td style="text-align:right;">
+90.6667
+</td>
+<td style="text-align:right;">
+11.0000
+</td>
+<td style="text-align:right;">
+177.6667
+</td>
+<td style="text-align:right;">
+0.4278
+</td>
+<td style="text-align:right;">
+0.5103
+</td>
+<td style="text-align:right;">
+0.0619
+</td>
+<td style="text-align:right;">
+111.3333
+</td>
+<td style="text-align:right;">
+142.0000
+</td>
+<td style="text-align:right;">
+3.0000
+</td>
+<td style="text-align:right;">
+256.3333
+</td>
+<td style="text-align:right;">
+0.4343
+</td>
+<td style="text-align:right;">
+0.5540
+</td>
+<td style="text-align:right;">
+0.0117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001567500001
+</td>
+<td style="text-align:right;">
+159.3333
+</td>
+<td style="text-align:right;">
+161.3333
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+324.6667
+</td>
+<td style="text-align:right;">
+0.4908
+</td>
+<td style="text-align:right;">
+0.4969
+</td>
+<td style="text-align:right;">
+0.0123
+</td>
+<td style="text-align:right;">
+166.0
+</td>
+<td style="text-align:right;">
+157.5
+</td>
+<td style="text-align:right;">
+15.5
+</td>
+<td style="text-align:right;">
+339.0
+</td>
+<td style="text-align:right;">
+0.4897
+</td>
+<td style="text-align:right;">
+0.4646
+</td>
+<td style="text-align:right;">
+0.0457
+</td>
+<td style="text-align:right;">
+125.0000
+</td>
+<td style="text-align:right;">
+143.6667
+</td>
+<td style="text-align:right;">
+14.3333
+</td>
+<td style="text-align:right;">
+283.0000
+</td>
+<td style="text-align:right;">
+0.4417
+</td>
+<td style="text-align:right;">
+0.5077
+</td>
+<td style="text-align:right;">
+0.0506
+</td>
+<td style="text-align:right;">
+157.3333
+</td>
+<td style="text-align:right;">
+186.6667
+</td>
+<td style="text-align:right;">
+6.3333
+</td>
+<td style="text-align:right;">
+350.3333
+</td>
+<td style="text-align:right;">
+0.4491
+</td>
+<td style="text-align:right;">
+0.5328
+</td>
+<td style="text-align:right;">
+0.0181
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001654500001
+</td>
+<td style="text-align:right;">
+260.6667
+</td>
+<td style="text-align:right;">
+220.6667
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+484.0000
+</td>
+<td style="text-align:right;">
+0.5386
+</td>
+<td style="text-align:right;">
+0.4559
+</td>
+<td style="text-align:right;">
+0.0055
+</td>
+<td style="text-align:right;">
+284.5
+</td>
+<td style="text-align:right;">
+205.5
+</td>
+<td style="text-align:right;">
+18.0
+</td>
+<td style="text-align:right;">
+508.0
+</td>
+<td style="text-align:right;">
+0.5600
+</td>
+<td style="text-align:right;">
+0.4045
+</td>
+<td style="text-align:right;">
+0.0354
+</td>
+<td style="text-align:right;">
+172.0000
+</td>
+<td style="text-align:right;">
+200.3333
+</td>
+<td style="text-align:right;">
+13.3333
+</td>
+<td style="text-align:right;">
+385.6667
+</td>
+<td style="text-align:right;">
+0.4460
+</td>
+<td style="text-align:right;">
+0.5194
+</td>
+<td style="text-align:right;">
+0.0346
+</td>
+<td style="text-align:right;">
+208.6667
+</td>
+<td style="text-align:right;">
+263.0000
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+476.0000
+</td>
+<td style="text-align:right;">
+0.4384
+</td>
+<td style="text-align:right;">
+0.5525
+</td>
+<td style="text-align:right;">
+0.0091
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001654500002
+</td>
+<td style="text-align:right;">
+92.0000
+</td>
+<td style="text-align:right;">
+78.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+171.6667
+</td>
+<td style="text-align:right;">
+0.5359
+</td>
+<td style="text-align:right;">
+0.4544
+</td>
+<td style="text-align:right;">
+0.0097
+</td>
+<td style="text-align:right;">
+100.0
+</td>
+<td style="text-align:right;">
+72.5
+</td>
+<td style="text-align:right;">
+8.5
+</td>
+<td style="text-align:right;">
+181.0
+</td>
+<td style="text-align:right;">
+0.5525
+</td>
+<td style="text-align:right;">
+0.4006
+</td>
+<td style="text-align:right;">
+0.0470
+</td>
+<td style="text-align:right;">
+61.0000
+</td>
+<td style="text-align:right;">
+71.0000
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+137.6667
+</td>
+<td style="text-align:right;">
+0.4431
+</td>
+<td style="text-align:right;">
+0.5157
+</td>
+<td style="text-align:right;">
+0.0412
+</td>
+<td style="text-align:right;">
+70.6667
+</td>
+<td style="text-align:right;">
+89.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+162.3333
+</td>
+<td style="text-align:right;">
+0.4353
+</td>
+<td style="text-align:right;">
+0.5524
+</td>
+<td style="text-align:right;">
+0.0123
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001658250001
+</td>
+<td style="text-align:right;">
+246.6667
+</td>
+<td style="text-align:right;">
+233.0000
+</td>
+<td style="text-align:right;">
+3.6667
+</td>
+<td style="text-align:right;">
+483.3333
+</td>
+<td style="text-align:right;">
+0.5103
+</td>
+<td style="text-align:right;">
+0.4821
+</td>
+<td style="text-align:right;">
+0.0076
+</td>
+<td style="text-align:right;">
+269.0
+</td>
+<td style="text-align:right;">
+221.5
+</td>
+<td style="text-align:right;">
+23.0
+</td>
+<td style="text-align:right;">
+513.5
+</td>
+<td style="text-align:right;">
+0.5239
+</td>
+<td style="text-align:right;">
+0.4314
+</td>
+<td style="text-align:right;">
+0.0448
+</td>
+<td style="text-align:right;">
+173.3333
+</td>
+<td style="text-align:right;">
+209.6667
+</td>
+<td style="text-align:right;">
+15.6667
+</td>
+<td style="text-align:right;">
+398.6667
+</td>
+<td style="text-align:right;">
+0.4348
+</td>
+<td style="text-align:right;">
+0.5259
+</td>
+<td style="text-align:right;">
+0.0393
+</td>
+<td style="text-align:right;">
+198.3333
+</td>
+<td style="text-align:right;">
+298.3333
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+502.3333
+</td>
+<td style="text-align:right;">
+0.3948
+</td>
+<td style="text-align:right;">
+0.5939
+</td>
+<td style="text-align:right;">
+0.0113
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001658250002
+</td>
+<td style="text-align:right;">
+39.0000
+</td>
+<td style="text-align:right;">
+36.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+75.6667
+</td>
+<td style="text-align:right;">
+0.5154
+</td>
+<td style="text-align:right;">
+0.4846
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+42.5
+</td>
+<td style="text-align:right;">
+35.0
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+80.0
+</td>
+<td style="text-align:right;">
+0.5312
+</td>
+<td style="text-align:right;">
+0.4375
+</td>
+<td style="text-align:right;">
+0.0312
+</td>
+<td style="text-align:right;">
+27.0000
+</td>
+<td style="text-align:right;">
+33.0000
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+61.3333
+</td>
+<td style="text-align:right;">
+0.4402
+</td>
+<td style="text-align:right;">
+0.5380
+</td>
+<td style="text-align:right;">
+0.0217
+</td>
+<td style="text-align:right;">
+31.0000
+</td>
+<td style="text-align:right;">
+51.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+82.3333
+</td>
+<td style="text-align:right;">
+0.3765
+</td>
+<td style="text-align:right;">
+0.6194
+</td>
+<td style="text-align:right;">
+0.0040
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001658250003
+</td>
+<td style="text-align:right;">
+24.3333
+</td>
+<td style="text-align:right;">
+23.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+47.6667
+</td>
+<td style="text-align:right;">
+0.5105
+</td>
+<td style="text-align:right;">
+0.4825
+</td>
+<td style="text-align:right;">
+0.0070
+</td>
+<td style="text-align:right;">
+26.5
+</td>
+<td style="text-align:right;">
+22.0
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+50.5
+</td>
+<td style="text-align:right;">
+0.5248
+</td>
+<td style="text-align:right;">
+0.4356
+</td>
+<td style="text-align:right;">
+0.0396
+</td>
+<td style="text-align:right;">
+17.0000
+</td>
+<td style="text-align:right;">
+20.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+38.6667
+</td>
+<td style="text-align:right;">
+0.4397
+</td>
+<td style="text-align:right;">
+0.5345
+</td>
+<td style="text-align:right;">
+0.0259
+</td>
+<td style="text-align:right;">
+19.3333
+</td>
+<td style="text-align:right;">
+28.3333
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+48.0000
+</td>
+<td style="text-align:right;">
+0.4028
+</td>
+<td style="text-align:right;">
+0.5903
+</td>
+<td style="text-align:right;">
+0.0069
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001674250001
+</td>
+<td style="text-align:right;">
+52.0000
+</td>
+<td style="text-align:right;">
+29.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+81.0000
+</td>
+<td style="text-align:right;">
+0.6420
+</td>
+<td style="text-align:right;">
+0.3580
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+51.0
+</td>
+<td style="text-align:right;">
+28.0
+</td>
+<td style="text-align:right;">
+5.5
+</td>
+<td style="text-align:right;">
+84.5
+</td>
+<td style="text-align:right;">
+0.6036
+</td>
+<td style="text-align:right;">
+0.3314
+</td>
+<td style="text-align:right;">
+0.0651
+</td>
+<td style="text-align:right;">
+33.0000
+</td>
+<td style="text-align:right;">
+30.3333
+</td>
+<td style="text-align:right;">
+5.0000
+</td>
+<td style="text-align:right;">
+68.3333
+</td>
+<td style="text-align:right;">
+0.4829
+</td>
+<td style="text-align:right;">
+0.4439
+</td>
+<td style="text-align:right;">
+0.0732
+</td>
+<td style="text-align:right;">
+44.6667
+</td>
+<td style="text-align:right;">
+36.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+83.3333
+</td>
+<td style="text-align:right;">
+0.5360
+</td>
+<td style="text-align:right;">
+0.4400
+</td>
+<td style="text-align:right;">
+0.0240
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001692750001
+</td>
+<td style="text-align:right;">
+195.0000
+</td>
+<td style="text-align:right;">
+150.3333
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+348.0000
+</td>
+<td style="text-align:right;">
+0.5603
+</td>
+<td style="text-align:right;">
+0.4320
+</td>
+<td style="text-align:right;">
+0.0077
+</td>
+<td style="text-align:right;">
+210.5
+</td>
+<td style="text-align:right;">
+135.5
+</td>
+<td style="text-align:right;">
+15.0
+</td>
+<td style="text-align:right;">
+361.0
+</td>
+<td style="text-align:right;">
+0.5831
+</td>
+<td style="text-align:right;">
+0.3753
+</td>
+<td style="text-align:right;">
+0.0416
+</td>
+<td style="text-align:right;">
+159.6667
+</td>
+<td style="text-align:right;">
+131.3333
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+300.3333
+</td>
+<td style="text-align:right;">
+0.5316
+</td>
+<td style="text-align:right;">
+0.4373
+</td>
+<td style="text-align:right;">
+0.0311
+</td>
+<td style="text-align:right;">
+180.6667
+</td>
+<td style="text-align:right;">
+146.0000
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+336.0000
+</td>
+<td style="text-align:right;">
+0.5377
+</td>
+<td style="text-align:right;">
+0.4345
+</td>
+<td style="text-align:right;">
+0.0278
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001692750002
+</td>
+<td style="text-align:right;">
+210.0000
+</td>
+<td style="text-align:right;">
+161.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+372.6667
+</td>
+<td style="text-align:right;">
+0.5635
+</td>
+<td style="text-align:right;">
+0.4338
+</td>
+<td style="text-align:right;">
+0.0027
+</td>
+<td style="text-align:right;">
+227.0
+</td>
+<td style="text-align:right;">
+146.0
+</td>
+<td style="text-align:right;">
+12.5
+</td>
+<td style="text-align:right;">
+385.5
+</td>
+<td style="text-align:right;">
+0.5888
+</td>
+<td style="text-align:right;">
+0.3787
+</td>
+<td style="text-align:right;">
+0.0324
+</td>
+<td style="text-align:right;">
+172.0000
+</td>
+<td style="text-align:right;">
+141.0000
+</td>
+<td style="text-align:right;">
+8.0000
+</td>
+<td style="text-align:right;">
+321.0000
+</td>
+<td style="text-align:right;">
+0.5358
+</td>
+<td style="text-align:right;">
+0.4393
+</td>
+<td style="text-align:right;">
+0.0249
+</td>
+<td style="text-align:right;">
+192.6667
+</td>
+<td style="text-align:right;">
+153.6667
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+350.3333
+</td>
+<td style="text-align:right;">
+0.5500
+</td>
+<td style="text-align:right;">
+0.4386
+</td>
+<td style="text-align:right;">
+0.0114
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001692750003
+</td>
+<td style="text-align:right;">
+221.0000
+</td>
+<td style="text-align:right;">
+170.0000
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+392.3333
+</td>
+<td style="text-align:right;">
+0.5633
+</td>
+<td style="text-align:right;">
+0.4333
+</td>
+<td style="text-align:right;">
+0.0034
+</td>
+<td style="text-align:right;">
+239.0
+</td>
+<td style="text-align:right;">
+153.5
+</td>
+<td style="text-align:right;">
+14.0
+</td>
+<td style="text-align:right;">
+406.5
+</td>
+<td style="text-align:right;">
+0.5879
+</td>
+<td style="text-align:right;">
+0.3776
+</td>
+<td style="text-align:right;">
+0.0344
+</td>
+<td style="text-align:right;">
+181.0000
+</td>
+<td style="text-align:right;">
+148.3333
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+338.6667
+</td>
+<td style="text-align:right;">
+0.5344
+</td>
+<td style="text-align:right;">
+0.4380
+</td>
+<td style="text-align:right;">
+0.0276
+</td>
+<td style="text-align:right;">
+207.3333
+</td>
+<td style="text-align:right;">
+165.6667
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+378.3333
+</td>
+<td style="text-align:right;">
+0.5480
+</td>
+<td style="text-align:right;">
+0.4379
+</td>
+<td style="text-align:right;">
+0.0141
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001692750004
+</td>
+<td style="text-align:right;">
+181.3333
+</td>
+<td style="text-align:right;">
+139.6667
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+323.3333
+</td>
+<td style="text-align:right;">
+0.5608
+</td>
+<td style="text-align:right;">
+0.4320
+</td>
+<td style="text-align:right;">
+0.0072
+</td>
+<td style="text-align:right;">
+196.0
+</td>
+<td style="text-align:right;">
+125.5
+</td>
+<td style="text-align:right;">
+13.5
+</td>
+<td style="text-align:right;">
+335.0
+</td>
+<td style="text-align:right;">
+0.5851
+</td>
+<td style="text-align:right;">
+0.3746
+</td>
+<td style="text-align:right;">
+0.0403
+</td>
+<td style="text-align:right;">
+148.3333
+</td>
+<td style="text-align:right;">
+121.6667
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+279.0000
+</td>
+<td style="text-align:right;">
+0.5317
+</td>
+<td style="text-align:right;">
+0.4361
+</td>
+<td style="text-align:right;">
+0.0323
+</td>
+<td style="text-align:right;">
+163.0000
+</td>
+<td style="text-align:right;">
+130.0000
+</td>
+<td style="text-align:right;">
+4.6667
+</td>
+<td style="text-align:right;">
+297.6667
+</td>
+<td style="text-align:right;">
+0.5476
+</td>
+<td style="text-align:right;">
+0.4367
+</td>
+<td style="text-align:right;">
+0.0157
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001692750005
+</td>
+<td style="text-align:right;">
+251.3333
+</td>
+<td style="text-align:right;">
+193.3333
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+446.0000
+</td>
+<td style="text-align:right;">
+0.5635
+</td>
+<td style="text-align:right;">
+0.4335
+</td>
+<td style="text-align:right;">
+0.0030
+</td>
+<td style="text-align:right;">
+272.0
+</td>
+<td style="text-align:right;">
+174.5
+</td>
+<td style="text-align:right;">
+15.5
+</td>
+<td style="text-align:right;">
+462.0
+</td>
+<td style="text-align:right;">
+0.5887
+</td>
+<td style="text-align:right;">
+0.3777
+</td>
+<td style="text-align:right;">
+0.0335
+</td>
+<td style="text-align:right;">
+205.3333
+</td>
+<td style="text-align:right;">
+169.0000
+</td>
+<td style="text-align:right;">
+9.6667
+</td>
+<td style="text-align:right;">
+384.0000
+</td>
+<td style="text-align:right;">
+0.5347
+</td>
+<td style="text-align:right;">
+0.4401
+</td>
+<td style="text-align:right;">
+0.0252
+</td>
+<td style="text-align:right;">
+223.6667
+</td>
+<td style="text-align:right;">
+179.0000
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+408.6667
+</td>
+<td style="text-align:right;">
+0.5473
+</td>
+<td style="text-align:right;">
+0.4380
+</td>
+<td style="text-align:right;">
+0.0147
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001763500001
+</td>
+<td style="text-align:right;">
+117.3333
+</td>
+<td style="text-align:right;">
+82.0000
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+201.3333
+</td>
+<td style="text-align:right;">
+0.5828
+</td>
+<td style="text-align:right;">
+0.4073
+</td>
+<td style="text-align:right;">
+0.0099
+</td>
+<td style="text-align:right;">
+141.0
+</td>
+<td style="text-align:right;">
+81.0
+</td>
+<td style="text-align:right;">
+13.5
+</td>
+<td style="text-align:right;">
+235.5
+</td>
+<td style="text-align:right;">
+0.5987
+</td>
+<td style="text-align:right;">
+0.3439
+</td>
+<td style="text-align:right;">
+0.0573
+</td>
+<td style="text-align:right;">
+90.0000
+</td>
+<td style="text-align:right;">
+69.3333
+</td>
+<td style="text-align:right;">
+9.6667
+</td>
+<td style="text-align:right;">
+169.0000
+</td>
+<td style="text-align:right;">
+0.5325
+</td>
+<td style="text-align:right;">
+0.4103
+</td>
+<td style="text-align:right;">
+0.0572
+</td>
+<td style="text-align:right;">
+100.3333
+</td>
+<td style="text-align:right;">
+101.0000
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+203.3333
+</td>
+<td style="text-align:right;">
+0.4934
+</td>
+<td style="text-align:right;">
+0.4967
+</td>
+<td style="text-align:right;">
+0.0098
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001763500002
+</td>
+<td style="text-align:right;">
+216.0000
+</td>
+<td style="text-align:right;">
+151.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+368.6667
+</td>
+<td style="text-align:right;">
+0.5859
+</td>
+<td style="text-align:right;">
+0.4096
+</td>
+<td style="text-align:right;">
+0.0045
+</td>
+<td style="text-align:right;">
+261.0
+</td>
+<td style="text-align:right;">
+150.0
+</td>
+<td style="text-align:right;">
+20.5
+</td>
+<td style="text-align:right;">
+431.5
+</td>
+<td style="text-align:right;">
+0.6049
+</td>
+<td style="text-align:right;">
+0.3476
+</td>
+<td style="text-align:right;">
+0.0475
+</td>
+<td style="text-align:right;">
+165.6667
+</td>
+<td style="text-align:right;">
+127.0000
+</td>
+<td style="text-align:right;">
+14.6667
+</td>
+<td style="text-align:right;">
+307.3333
+</td>
+<td style="text-align:right;">
+0.5390
+</td>
+<td style="text-align:right;">
+0.4132
+</td>
+<td style="text-align:right;">
+0.0477
+</td>
+<td style="text-align:right;">
+177.0000
+</td>
+<td style="text-align:right;">
+176.0000
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+355.0000
+</td>
+<td style="text-align:right;">
+0.4986
+</td>
+<td style="text-align:right;">
+0.4958
+</td>
+<td style="text-align:right;">
+0.0056
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001778000001
+</td>
+<td style="text-align:right;">
+128.3333
+</td>
+<td style="text-align:right;">
+115.3333
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+245.6667
+</td>
+<td style="text-align:right;">
+0.5224
+</td>
+<td style="text-align:right;">
+0.4695
+</td>
+<td style="text-align:right;">
+0.0081
+</td>
+<td style="text-align:right;">
+159.5
+</td>
+<td style="text-align:right;">
+99.0
+</td>
+<td style="text-align:right;">
+11.5
+</td>
+<td style="text-align:right;">
+270.0
+</td>
+<td style="text-align:right;">
+0.5907
+</td>
+<td style="text-align:right;">
+0.3667
+</td>
+<td style="text-align:right;">
+0.0426
+</td>
+<td style="text-align:right;">
+108.0000
+</td>
+<td style="text-align:right;">
+104.0000
+</td>
+<td style="text-align:right;">
+7.6667
+</td>
+<td style="text-align:right;">
+219.6667
+</td>
+<td style="text-align:right;">
+0.4917
+</td>
+<td style="text-align:right;">
+0.4734
+</td>
+<td style="text-align:right;">
+0.0349
+</td>
+<td style="text-align:right;">
+113.0000
+</td>
+<td style="text-align:right;">
+113.0000
+</td>
+<td style="text-align:right;">
+6.6667
+</td>
+<td style="text-align:right;">
+232.6667
+</td>
+<td style="text-align:right;">
+0.4857
+</td>
+<td style="text-align:right;">
+0.4857
+</td>
+<td style="text-align:right;">
+0.0287
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001778000002
+</td>
+<td style="text-align:right;">
+127.0000
+</td>
+<td style="text-align:right;">
+114.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+242.6667
+</td>
+<td style="text-align:right;">
+0.5234
+</td>
+<td style="text-align:right;">
+0.4698
+</td>
+<td style="text-align:right;">
+0.0069
+</td>
+<td style="text-align:right;">
+158.5
+</td>
+<td style="text-align:right;">
+98.0
+</td>
+<td style="text-align:right;">
+11.0
+</td>
+<td style="text-align:right;">
+267.5
+</td>
+<td style="text-align:right;">
+0.5925
+</td>
+<td style="text-align:right;">
+0.3664
+</td>
+<td style="text-align:right;">
+0.0411
+</td>
+<td style="text-align:right;">
+107.3333
+</td>
+<td style="text-align:right;">
+103.6667
+</td>
+<td style="text-align:right;">
+7.6667
+</td>
+<td style="text-align:right;">
+218.6667
+</td>
+<td style="text-align:right;">
+0.4909
+</td>
+<td style="text-align:right;">
+0.4741
+</td>
+<td style="text-align:right;">
+0.0351
+</td>
+<td style="text-align:right;">
+116.3333
+</td>
+<td style="text-align:right;">
+115.3333
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+237.0000
+</td>
+<td style="text-align:right;">
+0.4909
+</td>
+<td style="text-align:right;">
+0.4866
+</td>
+<td style="text-align:right;">
+0.0225
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001778000003
+</td>
+<td style="text-align:right;">
+33.3333
+</td>
+<td style="text-align:right;">
+30.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+63.3333
+</td>
+<td style="text-align:right;">
+0.5263
+</td>
+<td style="text-align:right;">
+0.4737
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+41.0
+</td>
+<td style="text-align:right;">
+25.0
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+68.0
+</td>
+<td style="text-align:right;">
+0.6029
+</td>
+<td style="text-align:right;">
+0.3676
+</td>
+<td style="text-align:right;">
+0.0294
+</td>
+<td style="text-align:right;">
+27.6667
+</td>
+<td style="text-align:right;">
+26.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+55.3333
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.4819
+</td>
+<td style="text-align:right;">
+0.0181
+</td>
+<td style="text-align:right;">
+29.0000
+</td>
+<td style="text-align:right;">
+29.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+58.3333
+</td>
+<td style="text-align:right;">
+0.4971
+</td>
+<td style="text-align:right;">
+0.4971
+</td>
+<td style="text-align:right;">
+0.0057
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001881500005
+</td>
+<td style="text-align:right;">
+7.3333
+</td>
+<td style="text-align:right;">
+8.3333
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+16.0000
+</td>
+<td style="text-align:right;">
+0.4583
+</td>
+<td style="text-align:right;">
+0.5208
+</td>
+<td style="text-align:right;">
+0.0208
+</td>
+<td style="text-align:right;">
+13.0
+</td>
+<td style="text-align:right;">
+7.0
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+21.0
+</td>
+<td style="text-align:right;">
+0.6190
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+0.0476
+</td>
+<td style="text-align:right;">
+3.0000
+</td>
+<td style="text-align:right;">
+8.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+11.0000
+</td>
+<td style="text-align:right;">
+0.2727
+</td>
+<td style="text-align:right;">
+0.7273
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+14.6667
+</td>
+<td style="text-align:right;">
+0.6364
+</td>
+<td style="text-align:right;">
+0.3636
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55001881500009
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003005500001
+</td>
+<td style="text-align:right;">
+116.3333
+</td>
+<td style="text-align:right;">
+78.3333
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+196.0000
+</td>
+<td style="text-align:right;">
+0.5935
+</td>
+<td style="text-align:right;">
+0.3997
+</td>
+<td style="text-align:right;">
+0.0068
+</td>
+<td style="text-align:right;">
+145.0
+</td>
+<td style="text-align:right;">
+71.5
+</td>
+<td style="text-align:right;">
+8.0
+</td>
+<td style="text-align:right;">
+224.5
+</td>
+<td style="text-align:right;">
+0.6459
+</td>
+<td style="text-align:right;">
+0.3185
+</td>
+<td style="text-align:right;">
+0.0356
+</td>
+<td style="text-align:right;">
+105.0000
+</td>
+<td style="text-align:right;">
+76.0000
+</td>
+<td style="text-align:right;">
+6.3333
+</td>
+<td style="text-align:right;">
+187.3333
+</td>
+<td style="text-align:right;">
+0.5605
+</td>
+<td style="text-align:right;">
+0.4057
+</td>
+<td style="text-align:right;">
+0.0338
+</td>
+<td style="text-align:right;">
+133.6667
+</td>
+<td style="text-align:right;">
+93.6667
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+230.0000
+</td>
+<td style="text-align:right;">
+0.5812
+</td>
+<td style="text-align:right;">
+0.4072
+</td>
+<td style="text-align:right;">
+0.0116
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250001
+</td>
+<td style="text-align:right;">
+193.0000
+</td>
+<td style="text-align:right;">
+202.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+397.6667
+</td>
+<td style="text-align:right;">
+0.4853
+</td>
+<td style="text-align:right;">
+0.5088
+</td>
+<td style="text-align:right;">
+0.0059
+</td>
+<td style="text-align:right;">
+218.5
+</td>
+<td style="text-align:right;">
+191.0
+</td>
+<td style="text-align:right;">
+12.5
+</td>
+<td style="text-align:right;">
+422.0
+</td>
+<td style="text-align:right;">
+0.5178
+</td>
+<td style="text-align:right;">
+0.4526
+</td>
+<td style="text-align:right;">
+0.0296
+</td>
+<td style="text-align:right;">
+168.6667
+</td>
+<td style="text-align:right;">
+177.6667
+</td>
+<td style="text-align:right;">
+8.0000
+</td>
+<td style="text-align:right;">
+354.3333
+</td>
+<td style="text-align:right;">
+0.4760
+</td>
+<td style="text-align:right;">
+0.5014
+</td>
+<td style="text-align:right;">
+0.0226
+</td>
+<td style="text-align:right;">
+213.3333
+</td>
+<td style="text-align:right;">
+220.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+435.3333
+</td>
+<td style="text-align:right;">
+0.4900
+</td>
+<td style="text-align:right;">
+0.5061
+</td>
+<td style="text-align:right;">
+0.0038
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250002
+</td>
+<td style="text-align:right;">
+57.6667
+</td>
+<td style="text-align:right;">
+154.3333
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+216.0000
+</td>
+<td style="text-align:right;">
+0.2670
+</td>
+<td style="text-align:right;">
+0.7145
+</td>
+<td style="text-align:right;">
+0.0185
+</td>
+<td style="text-align:right;">
+88.0
+</td>
+<td style="text-align:right;">
+158.0
+</td>
+<td style="text-align:right;">
+18.5
+</td>
+<td style="text-align:right;">
+264.5
+</td>
+<td style="text-align:right;">
+0.3327
+</td>
+<td style="text-align:right;">
+0.5974
+</td>
+<td style="text-align:right;">
+0.0699
+</td>
+<td style="text-align:right;">
+50.3333
+</td>
+<td style="text-align:right;">
+152.6667
+</td>
+<td style="text-align:right;">
+12.6667
+</td>
+<td style="text-align:right;">
+215.6667
+</td>
+<td style="text-align:right;">
+0.2334
+</td>
+<td style="text-align:right;">
+0.7079
+</td>
+<td style="text-align:right;">
+0.0587
+</td>
+<td style="text-align:right;">
+77.6667
+</td>
+<td style="text-align:right;">
+189.0000
+</td>
+<td style="text-align:right;">
+6.6667
+</td>
+<td style="text-align:right;">
+273.3333
+</td>
+<td style="text-align:right;">
+0.2841
+</td>
+<td style="text-align:right;">
+0.6915
+</td>
+<td style="text-align:right;">
+0.0244
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250003
+</td>
+<td style="text-align:right;">
+81.6667
+</td>
+<td style="text-align:right;">
+174.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+257.0000
+</td>
+<td style="text-align:right;">
+0.3178
+</td>
+<td style="text-align:right;">
+0.6783
+</td>
+<td style="text-align:right;">
+0.0039
+</td>
+<td style="text-align:right;">
+106.0
+</td>
+<td style="text-align:right;">
+200.0
+</td>
+<td style="text-align:right;">
+10.5
+</td>
+<td style="text-align:right;">
+316.5
+</td>
+<td style="text-align:right;">
+0.3349
+</td>
+<td style="text-align:right;">
+0.6319
+</td>
+<td style="text-align:right;">
+0.0332
+</td>
+<td style="text-align:right;">
+74.0000
+</td>
+<td style="text-align:right;">
+164.6667
+</td>
+<td style="text-align:right;">
+10.0000
+</td>
+<td style="text-align:right;">
+248.6667
+</td>
+<td style="text-align:right;">
+0.2976
+</td>
+<td style="text-align:right;">
+0.6622
+</td>
+<td style="text-align:right;">
+0.0402
+</td>
+<td style="text-align:right;">
+94.6667
+</td>
+<td style="text-align:right;">
+198.0000
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+298.6667
+</td>
+<td style="text-align:right;">
+0.3170
+</td>
+<td style="text-align:right;">
+0.6629
+</td>
+<td style="text-align:right;">
+0.0201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250004
+</td>
+<td style="text-align:right;">
+120.0000
+</td>
+<td style="text-align:right;">
+272.0000
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+394.3333
+</td>
+<td style="text-align:right;">
+0.3043
+</td>
+<td style="text-align:right;">
+0.6898
+</td>
+<td style="text-align:right;">
+0.0059
+</td>
+<td style="text-align:right;">
+166.0
+</td>
+<td style="text-align:right;">
+258.5
+</td>
+<td style="text-align:right;">
+19.5
+</td>
+<td style="text-align:right;">
+444.0
+</td>
+<td style="text-align:right;">
+0.3739
+</td>
+<td style="text-align:right;">
+0.5822
+</td>
+<td style="text-align:right;">
+0.0439
+</td>
+<td style="text-align:right;">
+127.0000
+</td>
+<td style="text-align:right;">
+226.0000
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+362.0000
+</td>
+<td style="text-align:right;">
+0.3508
+</td>
+<td style="text-align:right;">
+0.6243
+</td>
+<td style="text-align:right;">
+0.0249
+</td>
+<td style="text-align:right;">
+161.6667
+</td>
+<td style="text-align:right;">
+269.0000
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+434.0000
+</td>
+<td style="text-align:right;">
+0.3725
+</td>
+<td style="text-align:right;">
+0.6198
+</td>
+<td style="text-align:right;">
+0.0077
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250005
+</td>
+<td style="text-align:right;">
+80.3333
+</td>
+<td style="text-align:right;">
+276.6667
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+359.3333
+</td>
+<td style="text-align:right;">
+0.2236
+</td>
+<td style="text-align:right;">
+0.7699
+</td>
+<td style="text-align:right;">
+0.0065
+</td>
+<td style="text-align:right;">
+103.0
+</td>
+<td style="text-align:right;">
+272.5
+</td>
+<td style="text-align:right;">
+17.0
+</td>
+<td style="text-align:right;">
+392.5
+</td>
+<td style="text-align:right;">
+0.2624
+</td>
+<td style="text-align:right;">
+0.6943
+</td>
+<td style="text-align:right;">
+0.0433
+</td>
+<td style="text-align:right;">
+80.0000
+</td>
+<td style="text-align:right;">
+230.0000
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+319.3333
+</td>
+<td style="text-align:right;">
+0.2505
+</td>
+<td style="text-align:right;">
+0.7203
+</td>
+<td style="text-align:right;">
+0.0292
+</td>
+<td style="text-align:right;">
+102.3333
+</td>
+<td style="text-align:right;">
+268.0000
+</td>
+<td style="text-align:right;">
+4.6667
+</td>
+<td style="text-align:right;">
+375.0000
+</td>
+<td style="text-align:right;">
+0.2729
+</td>
+<td style="text-align:right;">
+0.7147
+</td>
+<td style="text-align:right;">
+0.0124
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250006
+</td>
+<td style="text-align:right;">
+58.0000
+</td>
+<td style="text-align:right;">
+186.3333
+</td>
+<td style="text-align:right;">
+5.0000
+</td>
+<td style="text-align:right;">
+249.3333
+</td>
+<td style="text-align:right;">
+0.2326
+</td>
+<td style="text-align:right;">
+0.7473
+</td>
+<td style="text-align:right;">
+0.0201
+</td>
+<td style="text-align:right;">
+86.0
+</td>
+<td style="text-align:right;">
+200.5
+</td>
+<td style="text-align:right;">
+19.0
+</td>
+<td style="text-align:right;">
+305.5
+</td>
+<td style="text-align:right;">
+0.2815
+</td>
+<td style="text-align:right;">
+0.6563
+</td>
+<td style="text-align:right;">
+0.0622
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+178.3333
+</td>
+<td style="text-align:right;">
+15.0000
+</td>
+<td style="text-align:right;">
+239.0000
+</td>
+<td style="text-align:right;">
+0.1911
+</td>
+<td style="text-align:right;">
+0.7462
+</td>
+<td style="text-align:right;">
+0.0628
+</td>
+<td style="text-align:right;">
+81.0000
+</td>
+<td style="text-align:right;">
+207.6667
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+294.6667
+</td>
+<td style="text-align:right;">
+0.2749
+</td>
+<td style="text-align:right;">
+0.7048
+</td>
+<td style="text-align:right;">
+0.0204
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250007
+</td>
+<td style="text-align:right;">
+84.6667
+</td>
+<td style="text-align:right;">
+290.3333
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+378.3333
+</td>
+<td style="text-align:right;">
+0.2238
+</td>
+<td style="text-align:right;">
+0.7674
+</td>
+<td style="text-align:right;">
+0.0088
+</td>
+<td style="text-align:right;">
+120.0
+</td>
+<td style="text-align:right;">
+308.0
+</td>
+<td style="text-align:right;">
+42.5
+</td>
+<td style="text-align:right;">
+470.5
+</td>
+<td style="text-align:right;">
+0.2550
+</td>
+<td style="text-align:right;">
+0.6546
+</td>
+<td style="text-align:right;">
+0.0903
+</td>
+<td style="text-align:right;">
+47.6667
+</td>
+<td style="text-align:right;">
+222.0000
+</td>
+<td style="text-align:right;">
+34.0000
+</td>
+<td style="text-align:right;">
+303.3333
+</td>
+<td style="text-align:right;">
+0.1571
+</td>
+<td style="text-align:right;">
+0.7319
+</td>
+<td style="text-align:right;">
+0.1121
+</td>
+<td style="text-align:right;">
+84.3333
+</td>
+<td style="text-align:right;">
+243.6667
+</td>
+<td style="text-align:right;">
+21.0000
+</td>
+<td style="text-align:right;">
+349.0000
+</td>
+<td style="text-align:right;">
+0.2416
+</td>
+<td style="text-align:right;">
+0.6982
+</td>
+<td style="text-align:right;">
+0.0602
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250008
+</td>
+<td style="text-align:right;">
+80.6667
+</td>
+<td style="text-align:right;">
+203.6667
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+286.6667
+</td>
+<td style="text-align:right;">
+0.2814
+</td>
+<td style="text-align:right;">
+0.7105
+</td>
+<td style="text-align:right;">
+0.0081
+</td>
+<td style="text-align:right;">
+112.5
+</td>
+<td style="text-align:right;">
+185.0
+</td>
+<td style="text-align:right;">
+17.0
+</td>
+<td style="text-align:right;">
+314.5
+</td>
+<td style="text-align:right;">
+0.3577
+</td>
+<td style="text-align:right;">
+0.5882
+</td>
+<td style="text-align:right;">
+0.0541
+</td>
+<td style="text-align:right;">
+82.3333
+</td>
+<td style="text-align:right;">
+162.0000
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+253.3333
+</td>
+<td style="text-align:right;">
+0.3250
+</td>
+<td style="text-align:right;">
+0.6395
+</td>
+<td style="text-align:right;">
+0.0355
+</td>
+<td style="text-align:right;">
+104.0000
+</td>
+<td style="text-align:right;">
+208.6667
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+318.0000
+</td>
+<td style="text-align:right;">
+0.3270
+</td>
+<td style="text-align:right;">
+0.6562
+</td>
+<td style="text-align:right;">
+0.0168
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250009
+</td>
+<td style="text-align:right;">
+57.0000
+</td>
+<td style="text-align:right;">
+174.6667
+</td>
+<td style="text-align:right;">
+4.6667
+</td>
+<td style="text-align:right;">
+236.3333
+</td>
+<td style="text-align:right;">
+0.2412
+</td>
+<td style="text-align:right;">
+0.7391
+</td>
+<td style="text-align:right;">
+0.0197
+</td>
+<td style="text-align:right;">
+89.5
+</td>
+<td style="text-align:right;">
+178.0
+</td>
+<td style="text-align:right;">
+17.5
+</td>
+<td style="text-align:right;">
+285.0
+</td>
+<td style="text-align:right;">
+0.3140
+</td>
+<td style="text-align:right;">
+0.6246
+</td>
+<td style="text-align:right;">
+0.0614
+</td>
+<td style="text-align:right;">
+40.3333
+</td>
+<td style="text-align:right;">
+158.6667
+</td>
+<td style="text-align:right;">
+8.3333
+</td>
+<td style="text-align:right;">
+207.3333
+</td>
+<td style="text-align:right;">
+0.1945
+</td>
+<td style="text-align:right;">
+0.7653
+</td>
+<td style="text-align:right;">
+0.0402
+</td>
+<td style="text-align:right;">
+63.6667
+</td>
+<td style="text-align:right;">
+217.0000
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+286.0000
+</td>
+<td style="text-align:right;">
+0.2226
+</td>
+<td style="text-align:right;">
+0.7587
+</td>
+<td style="text-align:right;">
+0.0186
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250010
+</td>
+<td style="text-align:right;">
+86.3333
+</td>
+<td style="text-align:right;">
+184.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+273.0000
+</td>
+<td style="text-align:right;">
+0.3162
+</td>
+<td style="text-align:right;">
+0.6752
+</td>
+<td style="text-align:right;">
+0.0085
+</td>
+<td style="text-align:right;">
+132.0
+</td>
+<td style="text-align:right;">
+194.0
+</td>
+<td style="text-align:right;">
+14.0
+</td>
+<td style="text-align:right;">
+340.0
+</td>
+<td style="text-align:right;">
+0.3882
+</td>
+<td style="text-align:right;">
+0.5706
+</td>
+<td style="text-align:right;">
+0.0412
+</td>
+<td style="text-align:right;">
+74.0000
+</td>
+<td style="text-align:right;">
+189.3333
+</td>
+<td style="text-align:right;">
+8.3333
+</td>
+<td style="text-align:right;">
+271.6667
+</td>
+<td style="text-align:right;">
+0.2724
+</td>
+<td style="text-align:right;">
+0.6969
+</td>
+<td style="text-align:right;">
+0.0307
+</td>
+<td style="text-align:right;">
+91.0000
+</td>
+<td style="text-align:right;">
+236.6667
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+333.3333
+</td>
+<td style="text-align:right;">
+0.2730
+</td>
+<td style="text-align:right;">
+0.7100
+</td>
+<td style="text-align:right;">
+0.0170
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032250011
+</td>
+<td style="text-align:right;">
+108.3333
+</td>
+<td style="text-align:right;">
+223.0000
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+333.3333
+</td>
+<td style="text-align:right;">
+0.3250
+</td>
+<td style="text-align:right;">
+0.6690
+</td>
+<td style="text-align:right;">
+0.0060
+</td>
+<td style="text-align:right;">
+146.5
+</td>
+<td style="text-align:right;">
+209.5
+</td>
+<td style="text-align:right;">
+23.5
+</td>
+<td style="text-align:right;">
+379.5
+</td>
+<td style="text-align:right;">
+0.3860
+</td>
+<td style="text-align:right;">
+0.5520
+</td>
+<td style="text-align:right;">
+0.0619
+</td>
+<td style="text-align:right;">
+81.6667
+</td>
+<td style="text-align:right;">
+205.0000
+</td>
+<td style="text-align:right;">
+7.6667
+</td>
+<td style="text-align:right;">
+294.3333
+</td>
+<td style="text-align:right;">
+0.2775
+</td>
+<td style="text-align:right;">
+0.6965
+</td>
+<td style="text-align:right;">
+0.0260
+</td>
+<td style="text-align:right;">
+99.3333
+</td>
+<td style="text-align:right;">
+270.0000
+</td>
+<td style="text-align:right;">
+3.0000
+</td>
+<td style="text-align:right;">
+372.3333
+</td>
+<td style="text-align:right;">
+0.2668
+</td>
+<td style="text-align:right;">
+0.7252
+</td>
+<td style="text-align:right;">
+0.0081
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003032500001
+</td>
+<td style="text-align:right;">
+89.3333
+</td>
+<td style="text-align:right;">
+151.3333
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+242.0000
+</td>
+<td style="text-align:right;">
+0.3691
+</td>
+<td style="text-align:right;">
+0.6253
+</td>
+<td style="text-align:right;">
+0.0055
+</td>
+<td style="text-align:right;">
+144.0
+</td>
+<td style="text-align:right;">
+150.0
+</td>
+<td style="text-align:right;">
+13.5
+</td>
+<td style="text-align:right;">
+307.5
+</td>
+<td style="text-align:right;">
+0.4683
+</td>
+<td style="text-align:right;">
+0.4878
+</td>
+<td style="text-align:right;">
+0.0439
+</td>
+<td style="text-align:right;">
+84.0000
+</td>
+<td style="text-align:right;">
+159.0000
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+249.0000
+</td>
+<td style="text-align:right;">
+0.3373
+</td>
+<td style="text-align:right;">
+0.6386
+</td>
+<td style="text-align:right;">
+0.0241
+</td>
+<td style="text-align:right;">
+132.0000
+</td>
+<td style="text-align:right;">
+196.3333
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+335.3333
+</td>
+<td style="text-align:right;">
+0.3936
+</td>
+<td style="text-align:right;">
+0.5855
+</td>
+<td style="text-align:right;">
+0.0209
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003115250001
+</td>
+<td style="text-align:right;">
+11.0000
+</td>
+<td style="text-align:right;">
+14.0000
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+25.6667
+</td>
+<td style="text-align:right;">
+0.4286
+</td>
+<td style="text-align:right;">
+0.5455
+</td>
+<td style="text-align:right;">
+0.0260
+</td>
+<td style="text-align:right;">
+15.0
+</td>
+<td style="text-align:right;">
+17.0
+</td>
+<td style="text-align:right;">
+2.0
+</td>
+<td style="text-align:right;">
+34.0
+</td>
+<td style="text-align:right;">
+0.4412
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.0588
+</td>
+<td style="text-align:right;">
+9.6667
+</td>
+<td style="text-align:right;">
+14.6667
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+26.0000
+</td>
+<td style="text-align:right;">
+0.3718
+</td>
+<td style="text-align:right;">
+0.5641
+</td>
+<td style="text-align:right;">
+0.0641
+</td>
+<td style="text-align:right;">
+15.6667
+</td>
+<td style="text-align:right;">
+20.0000
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+37.0000
+</td>
+<td style="text-align:right;">
+0.4234
+</td>
+<td style="text-align:right;">
+0.5405
+</td>
+<td style="text-align:right;">
+0.0360
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003115250002
+</td>
+<td style="text-align:right;">
+47.6667
+</td>
+<td style="text-align:right;">
+61.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+108.6667
+</td>
+<td style="text-align:right;">
+0.4387
+</td>
+<td style="text-align:right;">
+0.5613
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+65.0
+</td>
+<td style="text-align:right;">
+73.0
+</td>
+<td style="text-align:right;">
+3.5
+</td>
+<td style="text-align:right;">
+141.5
+</td>
+<td style="text-align:right;">
+0.4594
+</td>
+<td style="text-align:right;">
+0.5159
+</td>
+<td style="text-align:right;">
+0.0247
+</td>
+<td style="text-align:right;">
+41.3333
+</td>
+<td style="text-align:right;">
+64.3333
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+109.0000
+</td>
+<td style="text-align:right;">
+0.3792
+</td>
+<td style="text-align:right;">
+0.5902
+</td>
+<td style="text-align:right;">
+0.0306
+</td>
+<td style="text-align:right;">
+52.6667
+</td>
+<td style="text-align:right;">
+71.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+125.6667
+</td>
+<td style="text-align:right;">
+0.4191
+</td>
+<td style="text-align:right;">
+0.5703
+</td>
+<td style="text-align:right;">
+0.0106
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003145500001
+</td>
+<td style="text-align:right;">
+99.0000
+</td>
+<td style="text-align:right;">
+75.3333
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+176.3333
+</td>
+<td style="text-align:right;">
+0.5614
+</td>
+<td style="text-align:right;">
+0.4272
+</td>
+<td style="text-align:right;">
+0.0113
+</td>
+<td style="text-align:right;">
+123.0
+</td>
+<td style="text-align:right;">
+77.5
+</td>
+<td style="text-align:right;">
+8.5
+</td>
+<td style="text-align:right;">
+209.0
+</td>
+<td style="text-align:right;">
+0.5885
+</td>
+<td style="text-align:right;">
+0.3708
+</td>
+<td style="text-align:right;">
+0.0407
+</td>
+<td style="text-align:right;">
+84.0000
+</td>
+<td style="text-align:right;">
+72.6667
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+162.6667
+</td>
+<td style="text-align:right;">
+0.5164
+</td>
+<td style="text-align:right;">
+0.4467
+</td>
+<td style="text-align:right;">
+0.0369
+</td>
+<td style="text-align:right;">
+108.3333
+</td>
+<td style="text-align:right;">
+93.6667
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+205.3333
+</td>
+<td style="text-align:right;">
+0.5276
+</td>
+<td style="text-align:right;">
+0.4562
+</td>
+<td style="text-align:right;">
+0.0162
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003292500001
+</td>
+<td style="text-align:right;">
+146.0000
+</td>
+<td style="text-align:right;">
+248.3333
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+397.6667
+</td>
+<td style="text-align:right;">
+0.3671
+</td>
+<td style="text-align:right;">
+0.6245
+</td>
+<td style="text-align:right;">
+0.0084
+</td>
+<td style="text-align:right;">
+220.5
+</td>
+<td style="text-align:right;">
+241.5
+</td>
+<td style="text-align:right;">
+17.5
+</td>
+<td style="text-align:right;">
+479.5
+</td>
+<td style="text-align:right;">
+0.4599
+</td>
+<td style="text-align:right;">
+0.5036
+</td>
+<td style="text-align:right;">
+0.0365
+</td>
+<td style="text-align:right;">
+131.6667
+</td>
+<td style="text-align:right;">
+242.6667
+</td>
+<td style="text-align:right;">
+11.3333
+</td>
+<td style="text-align:right;">
+385.6667
+</td>
+<td style="text-align:right;">
+0.3414
+</td>
+<td style="text-align:right;">
+0.6292
+</td>
+<td style="text-align:right;">
+0.0294
+</td>
+<td style="text-align:right;">
+143.0000
+</td>
+<td style="text-align:right;">
+260.3333
+</td>
+<td style="text-align:right;">
+5.0000
+</td>
+<td style="text-align:right;">
+408.3333
+</td>
+<td style="text-align:right;">
+0.3502
+</td>
+<td style="text-align:right;">
+0.6376
+</td>
+<td style="text-align:right;">
+0.0122
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003298750001
+</td>
+<td style="text-align:right;">
+17.3333
+</td>
+<td style="text-align:right;">
+12.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+29.6667
+</td>
+<td style="text-align:right;">
+0.5843
+</td>
+<td style="text-align:right;">
+0.4157
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+21.0
+</td>
+<td style="text-align:right;">
+12.0
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+35.5
+</td>
+<td style="text-align:right;">
+0.5915
+</td>
+<td style="text-align:right;">
+0.3380
+</td>
+<td style="text-align:right;">
+0.0704
+</td>
+<td style="text-align:right;">
+13.6667
+</td>
+<td style="text-align:right;">
+12.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+26.0000
+</td>
+<td style="text-align:right;">
+0.5256
+</td>
+<td style="text-align:right;">
+0.4744
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+17.6667
+</td>
+<td style="text-align:right;">
+21.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+40.3333
+</td>
+<td style="text-align:right;">
+0.4380
+</td>
+<td style="text-align:right;">
+0.5372
+</td>
+<td style="text-align:right;">
+0.0248
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003298750002
+</td>
+<td style="text-align:right;">
+62.6667
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+109.3333
+</td>
+<td style="text-align:right;">
+0.5732
+</td>
+<td style="text-align:right;">
+0.4177
+</td>
+<td style="text-align:right;">
+0.0091
+</td>
+<td style="text-align:right;">
+71.5
+</td>
+<td style="text-align:right;">
+39.5
+</td>
+<td style="text-align:right;">
+3.0
+</td>
+<td style="text-align:right;">
+114.0
+</td>
+<td style="text-align:right;">
+0.6272
+</td>
+<td style="text-align:right;">
+0.3465
+</td>
+<td style="text-align:right;">
+0.0263
+</td>
+<td style="text-align:right;">
+49.3333
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+96.0000
+</td>
+<td style="text-align:right;">
+0.5139
+</td>
+<td style="text-align:right;">
+0.4757
+</td>
+<td style="text-align:right;">
+0.0104
+</td>
+<td style="text-align:right;">
+61.3333
+</td>
+<td style="text-align:right;">
+70.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+133.3333
+</td>
+<td style="text-align:right;">
+0.4600
+</td>
+<td style="text-align:right;">
+0.5300
+</td>
+<td style="text-align:right;">
+0.0100
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003377750001
+</td>
+<td style="text-align:right;">
+156.6667
+</td>
+<td style="text-align:right;">
+115.6667
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+274.6667
+</td>
+<td style="text-align:right;">
+0.5704
+</td>
+<td style="text-align:right;">
+0.4211
+</td>
+<td style="text-align:right;">
+0.0085
+</td>
+<td style="text-align:right;">
+196.0
+</td>
+<td style="text-align:right;">
+126.0
+</td>
+<td style="text-align:right;">
+11.0
+</td>
+<td style="text-align:right;">
+333.0
+</td>
+<td style="text-align:right;">
+0.5886
+</td>
+<td style="text-align:right;">
+0.3784
+</td>
+<td style="text-align:right;">
+0.0330
+</td>
+<td style="text-align:right;">
+117.3333
+</td>
+<td style="text-align:right;">
+135.0000
+</td>
+<td style="text-align:right;">
+7.6667
+</td>
+<td style="text-align:right;">
+260.0000
+</td>
+<td style="text-align:right;">
+0.4513
+</td>
+<td style="text-align:right;">
+0.5192
+</td>
+<td style="text-align:right;">
+0.0295
+</td>
+<td style="text-align:right;">
+163.0000
+</td>
+<td style="text-align:right;">
+189.6667
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+358.3333
+</td>
+<td style="text-align:right;">
+0.4549
+</td>
+<td style="text-align:right;">
+0.5293
+</td>
+<td style="text-align:right;">
+0.0158
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003425620001
+</td>
+<td style="text-align:right;">
+47.3333
+</td>
+<td style="text-align:right;">
+200.3333
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+250.3333
+</td>
+<td style="text-align:right;">
+0.1891
+</td>
+<td style="text-align:right;">
+0.8003
+</td>
+<td style="text-align:right;">
+0.0107
+</td>
+<td style="text-align:right;">
+51.5
+</td>
+<td style="text-align:right;">
+174.5
+</td>
+<td style="text-align:right;">
+17.0
+</td>
+<td style="text-align:right;">
+243.0
+</td>
+<td style="text-align:right;">
+0.2119
+</td>
+<td style="text-align:right;">
+0.7181
+</td>
+<td style="text-align:right;">
+0.0700
+</td>
+<td style="text-align:right;">
+47.0000
+</td>
+<td style="text-align:right;">
+165.3333
+</td>
+<td style="text-align:right;">
+10.6667
+</td>
+<td style="text-align:right;">
+223.0000
+</td>
+<td style="text-align:right;">
+0.2108
+</td>
+<td style="text-align:right;">
+0.7414
+</td>
+<td style="text-align:right;">
+0.0478
+</td>
+<td style="text-align:right;">
+54.6667
+</td>
+<td style="text-align:right;">
+201.6667
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+259.6667
+</td>
+<td style="text-align:right;">
+0.2105
+</td>
+<td style="text-align:right;">
+0.7766
+</td>
+<td style="text-align:right;">
+0.0128
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003492000001
+</td>
+<td style="text-align:right;">
+40.0000
+</td>
+<td style="text-align:right;">
+51.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+91.0000
+</td>
+<td style="text-align:right;">
+0.4396
+</td>
+<td style="text-align:right;">
+0.5604
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+43.5
+</td>
+<td style="text-align:right;">
+46.0
+</td>
+<td style="text-align:right;">
+4.0
+</td>
+<td style="text-align:right;">
+93.5
+</td>
+<td style="text-align:right;">
+0.4652
+</td>
+<td style="text-align:right;">
+0.4920
+</td>
+<td style="text-align:right;">
+0.0428
+</td>
+<td style="text-align:right;">
+31.0000
+</td>
+<td style="text-align:right;">
+50.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+83.0000
+</td>
+<td style="text-align:right;">
+0.3735
+</td>
+<td style="text-align:right;">
+0.6104
+</td>
+<td style="text-align:right;">
+0.0161
+</td>
+<td style="text-align:right;">
+34.3333
+</td>
+<td style="text-align:right;">
+56.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+90.6667
+</td>
+<td style="text-align:right;">
+0.3787
+</td>
+<td style="text-align:right;">
+0.6176
+</td>
+<td style="text-align:right;">
+0.0037
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003492000002
+</td>
+<td style="text-align:right;">
+50.0000
+</td>
+<td style="text-align:right;">
+62.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+113.3333
+</td>
+<td style="text-align:right;">
+0.4412
+</td>
+<td style="text-align:right;">
+0.5500
+</td>
+<td style="text-align:right;">
+0.0088
+</td>
+<td style="text-align:right;">
+53.5
+</td>
+<td style="text-align:right;">
+56.5
+</td>
+<td style="text-align:right;">
+8.0
+</td>
+<td style="text-align:right;">
+118.0
+</td>
+<td style="text-align:right;">
+0.4534
+</td>
+<td style="text-align:right;">
+0.4788
+</td>
+<td style="text-align:right;">
+0.0678
+</td>
+<td style="text-align:right;">
+38.0000
+</td>
+<td style="text-align:right;">
+61.6667
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+103.0000
+</td>
+<td style="text-align:right;">
+0.3689
+</td>
+<td style="text-align:right;">
+0.5987
+</td>
+<td style="text-align:right;">
+0.0324
+</td>
+<td style="text-align:right;">
+39.6667
+</td>
+<td style="text-align:right;">
+66.3333
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+107.3333
+</td>
+<td style="text-align:right;">
+0.3696
+</td>
+<td style="text-align:right;">
+0.6180
+</td>
+<td style="text-align:right;">
+0.0124
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003507000001
+</td>
+<td style="text-align:right;">
+85.3333
+</td>
+<td style="text-align:right;">
+135.3333
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+222.6667
+</td>
+<td style="text-align:right;">
+0.3832
+</td>
+<td style="text-align:right;">
+0.6078
+</td>
+<td style="text-align:right;">
+0.0090
+</td>
+<td style="text-align:right;">
+139.5
+</td>
+<td style="text-align:right;">
+150.5
+</td>
+<td style="text-align:right;">
+4.5
+</td>
+<td style="text-align:right;">
+294.5
+</td>
+<td style="text-align:right;">
+0.4737
+</td>
+<td style="text-align:right;">
+0.5110
+</td>
+<td style="text-align:right;">
+0.0153
+</td>
+<td style="text-align:right;">
+71.6667
+</td>
+<td style="text-align:right;">
+151.6667
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+230.3333
+</td>
+<td style="text-align:right;">
+0.3111
+</td>
+<td style="text-align:right;">
+0.6585
+</td>
+<td style="text-align:right;">
+0.0304
+</td>
+<td style="text-align:right;">
+105.3333
+</td>
+<td style="text-align:right;">
+201.3333
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+312.6667
+</td>
+<td style="text-align:right;">
+0.3369
+</td>
+<td style="text-align:right;">
+0.6439
+</td>
+<td style="text-align:right;">
+0.0192
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003544000001
+</td>
+<td style="text-align:right;">
+82.0000
+</td>
+<td style="text-align:right;">
+107.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+189.0000
+</td>
+<td style="text-align:right;">
+0.4339
+</td>
+<td style="text-align:right;">
+0.5661
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+107.5
+</td>
+<td style="text-align:right;">
+110.0
+</td>
+<td style="text-align:right;">
+5.0
+</td>
+<td style="text-align:right;">
+222.5
+</td>
+<td style="text-align:right;">
+0.4831
+</td>
+<td style="text-align:right;">
+0.4944
+</td>
+<td style="text-align:right;">
+0.0225
+</td>
+<td style="text-align:right;">
+72.0000
+</td>
+<td style="text-align:right;">
+103.3333
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+181.3333
+</td>
+<td style="text-align:right;">
+0.3971
+</td>
+<td style="text-align:right;">
+0.5699
+</td>
+<td style="text-align:right;">
+0.0331
+</td>
+<td style="text-align:right;">
+90.6667
+</td>
+<td style="text-align:right;">
+128.3333
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+219.3333
+</td>
+<td style="text-align:right;">
+0.4134
+</td>
+<td style="text-align:right;">
+0.5851
+</td>
+<td style="text-align:right;">
+0.0015
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003544000002
+</td>
+<td style="text-align:right;">
+18.3333
+</td>
+<td style="text-align:right;">
+23.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+42.3333
+</td>
+<td style="text-align:right;">
+0.4331
+</td>
+<td style="text-align:right;">
+0.5433
+</td>
+<td style="text-align:right;">
+0.0236
+</td>
+<td style="text-align:right;">
+23.5
+</td>
+<td style="text-align:right;">
+24.0
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+50.0
+</td>
+<td style="text-align:right;">
+0.4700
+</td>
+<td style="text-align:right;">
+0.4800
+</td>
+<td style="text-align:right;">
+0.0500
+</td>
+<td style="text-align:right;">
+16.0000
+</td>
+<td style="text-align:right;">
+22.6667
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+41.0000
+</td>
+<td style="text-align:right;">
+0.3902
+</td>
+<td style="text-align:right;">
+0.5528
+</td>
+<td style="text-align:right;">
+0.0569
+</td>
+<td style="text-align:right;">
+21.3333
+</td>
+<td style="text-align:right;">
+29.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+51.3333
+</td>
+<td style="text-align:right;">
+0.4156
+</td>
+<td style="text-align:right;">
+0.5649
+</td>
+<td style="text-align:right;">
+0.0195
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003544000003
+</td>
+<td style="text-align:right;">
+8.0000
+</td>
+<td style="text-align:right;">
+10.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+18.6667
+</td>
+<td style="text-align:right;">
+0.4286
+</td>
+<td style="text-align:right;">
+0.5714
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+10.5
+</td>
+<td style="text-align:right;">
+10.5
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+21.0
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+10.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+17.3333
+</td>
+<td style="text-align:right;">
+0.4038
+</td>
+<td style="text-align:right;">
+0.5962
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+7.6667
+</td>
+<td style="text-align:right;">
+11.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+19.3333
+</td>
+<td style="text-align:right;">
+0.3966
+</td>
+<td style="text-align:right;">
+0.6034
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003616000001
+</td>
+<td style="text-align:right;">
+17.3333
+</td>
+<td style="text-align:right;">
+13.6667
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+31.3333
+</td>
+<td style="text-align:right;">
+0.5532
+</td>
+<td style="text-align:right;">
+0.4362
+</td>
+<td style="text-align:right;">
+0.0106
+</td>
+<td style="text-align:right;">
+21.5
+</td>
+<td style="text-align:right;">
+15.5
+</td>
+<td style="text-align:right;">
+1.5
+</td>
+<td style="text-align:right;">
+38.5
+</td>
+<td style="text-align:right;">
+0.5584
+</td>
+<td style="text-align:right;">
+0.4026
+</td>
+<td style="text-align:right;">
+0.0390
+</td>
+<td style="text-align:right;">
+18.6667
+</td>
+<td style="text-align:right;">
+15.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+34.0000
+</td>
+<td style="text-align:right;">
+0.5490
+</td>
+<td style="text-align:right;">
+0.4412
+</td>
+<td style="text-align:right;">
+0.0098
+</td>
+<td style="text-align:right;">
+24.0000
+</td>
+<td style="text-align:right;">
+21.0000
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+0.5255
+</td>
+<td style="text-align:right;">
+0.4599
+</td>
+<td style="text-align:right;">
+0.0146
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003616000002
+</td>
+<td style="text-align:right;">
+24.0000
+</td>
+<td style="text-align:right;">
+19.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+44.3333
+</td>
+<td style="text-align:right;">
+0.5414
+</td>
+<td style="text-align:right;">
+0.4361
+</td>
+<td style="text-align:right;">
+0.0226
+</td>
+<td style="text-align:right;">
+29.0
+</td>
+<td style="text-align:right;">
+21.0
+</td>
+<td style="text-align:right;">
+5.5
+</td>
+<td style="text-align:right;">
+55.5
+</td>
+<td style="text-align:right;">
+0.5225
+</td>
+<td style="text-align:right;">
+0.3784
+</td>
+<td style="text-align:right;">
+0.0991
+</td>
+<td style="text-align:right;">
+25.0000
+</td>
+<td style="text-align:right;">
+20.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+47.6667
+</td>
+<td style="text-align:right;">
+0.5245
+</td>
+<td style="text-align:right;">
+0.4336
+</td>
+<td style="text-align:right;">
+0.0420
+</td>
+<td style="text-align:right;">
+29.0000
+</td>
+<td style="text-align:right;">
+26.3333
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+58.0000
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.4540
+</td>
+<td style="text-align:right;">
+0.0460
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003713500001
+</td>
+<td style="text-align:right;">
+26.6667
+</td>
+<td style="text-align:right;">
+153.3333
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+182.6667
+</td>
+<td style="text-align:right;">
+0.1460
+</td>
+<td style="text-align:right;">
+0.8394
+</td>
+<td style="text-align:right;">
+0.0146
+</td>
+<td style="text-align:right;">
+30.5
+</td>
+<td style="text-align:right;">
+160.5
+</td>
+<td style="text-align:right;">
+10.5
+</td>
+<td style="text-align:right;">
+201.5
+</td>
+<td style="text-align:right;">
+0.1514
+</td>
+<td style="text-align:right;">
+0.7965
+</td>
+<td style="text-align:right;">
+0.0521
+</td>
+<td style="text-align:right;">
+21.0000
+</td>
+<td style="text-align:right;">
+134.6667
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+161.6667
+</td>
+<td style="text-align:right;">
+0.1299
+</td>
+<td style="text-align:right;">
+0.8330
+</td>
+<td style="text-align:right;">
+0.0371
+</td>
+<td style="text-align:right;">
+29.3333
+</td>
+<td style="text-align:right;">
+189.6667
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+223.3333
+</td>
+<td style="text-align:right;">
+0.1313
+</td>
+<td style="text-align:right;">
+0.8493
+</td>
+<td style="text-align:right;">
+0.0194
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003713500002
+</td>
+<td style="text-align:right;">
+38.0000
+</td>
+<td style="text-align:right;">
+225.6667
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+265.6667
+</td>
+<td style="text-align:right;">
+0.1430
+</td>
+<td style="text-align:right;">
+0.8494
+</td>
+<td style="text-align:right;">
+0.0075
+</td>
+<td style="text-align:right;">
+44.0
+</td>
+<td style="text-align:right;">
+236.0
+</td>
+<td style="text-align:right;">
+11.5
+</td>
+<td style="text-align:right;">
+291.5
+</td>
+<td style="text-align:right;">
+0.1509
+</td>
+<td style="text-align:right;">
+0.8096
+</td>
+<td style="text-align:right;">
+0.0395
+</td>
+<td style="text-align:right;">
+29.3333
+</td>
+<td style="text-align:right;">
+198.6667
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+235.0000
+</td>
+<td style="text-align:right;">
+0.1248
+</td>
+<td style="text-align:right;">
+0.8454
+</td>
+<td style="text-align:right;">
+0.0298
+</td>
+<td style="text-align:right;">
+35.6667
+</td>
+<td style="text-align:right;">
+266.0000
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+303.6667
+</td>
+<td style="text-align:right;">
+0.1175
+</td>
+<td style="text-align:right;">
+0.8760
+</td>
+<td style="text-align:right;">
+0.0066
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003728250001
+</td>
+<td style="text-align:right;">
+29.3333
+</td>
+<td style="text-align:right;">
+35.0000
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+65.0000
+</td>
+<td style="text-align:right;">
+0.4513
+</td>
+<td style="text-align:right;">
+0.5385
+</td>
+<td style="text-align:right;">
+0.0103
+</td>
+<td style="text-align:right;">
+33.5
+</td>
+<td style="text-align:right;">
+29.0
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+65.0
+</td>
+<td style="text-align:right;">
+0.5154
+</td>
+<td style="text-align:right;">
+0.4462
+</td>
+<td style="text-align:right;">
+0.0385
+</td>
+<td style="text-align:right;">
+23.3333
+</td>
+<td style="text-align:right;">
+26.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+50.0000
+</td>
+<td style="text-align:right;">
+0.4667
+</td>
+<td style="text-align:right;">
+0.5333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+35.6667
+</td>
+<td style="text-align:right;">
+37.0000
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+73.3333
+</td>
+<td style="text-align:right;">
+0.4864
+</td>
+<td style="text-align:right;">
+0.5045
+</td>
+<td style="text-align:right;">
+0.0091
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003868500001
+</td>
+<td style="text-align:right;">
+222.0000
+</td>
+<td style="text-align:right;">
+131.0000
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+356.3333
+</td>
+<td style="text-align:right;">
+0.6230
+</td>
+<td style="text-align:right;">
+0.3676
+</td>
+<td style="text-align:right;">
+0.0094
+</td>
+<td style="text-align:right;">
+271.5
+</td>
+<td style="text-align:right;">
+127.5
+</td>
+<td style="text-align:right;">
+17.5
+</td>
+<td style="text-align:right;">
+416.5
+</td>
+<td style="text-align:right;">
+0.6519
+</td>
+<td style="text-align:right;">
+0.3061
+</td>
+<td style="text-align:right;">
+0.0420
+</td>
+<td style="text-align:right;">
+192.3333
+</td>
+<td style="text-align:right;">
+132.0000
+</td>
+<td style="text-align:right;">
+10.3333
+</td>
+<td style="text-align:right;">
+334.6667
+</td>
+<td style="text-align:right;">
+0.5747
+</td>
+<td style="text-align:right;">
+0.3944
+</td>
+<td style="text-align:right;">
+0.0309
+</td>
+<td style="text-align:right;">
+242.3333
+</td>
+<td style="text-align:right;">
+161.0000
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+408.6667
+</td>
+<td style="text-align:right;">
+0.5930
+</td>
+<td style="text-align:right;">
+0.3940
+</td>
+<td style="text-align:right;">
+0.0131
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55003868500002
+</td>
+<td style="text-align:right;">
+34.0000
+</td>
+<td style="text-align:right;">
+20.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+54.0000
+</td>
+<td style="text-align:right;">
+0.6296
+</td>
+<td style="text-align:right;">
+0.3704
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+30.5
+</td>
+<td style="text-align:right;">
+14.5
+</td>
+<td style="text-align:right;">
+0.5
+</td>
+<td style="text-align:right;">
+45.5
+</td>
+<td style="text-align:right;">
+0.6703
+</td>
+<td style="text-align:right;">
+0.3187
+</td>
+<td style="text-align:right;">
+0.0110
+</td>
+<td style="text-align:right;">
+29.3333
+</td>
+<td style="text-align:right;">
+20.0000
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+49.6667
+</td>
+<td style="text-align:right;">
+0.5906
+</td>
+<td style="text-align:right;">
+0.4027
+</td>
+<td style="text-align:right;">
+0.0067
+</td>
+<td style="text-align:right;">
+26.6667
+</td>
+<td style="text-align:right;">
+18.6667
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+46.0000
+</td>
+<td style="text-align:right;">
+0.5797
+</td>
+<td style="text-align:right;">
+0.4058
+</td>
+<td style="text-align:right;">
+0.0145
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005013250001
+</td>
+<td style="text-align:right;">
+136.0000
+</td>
+<td style="text-align:right;">
+70.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+208.0000
+</td>
+<td style="text-align:right;">
+0.6538
+</td>
+<td style="text-align:right;">
+0.3381
+</td>
+<td style="text-align:right;">
+0.0080
+</td>
+<td style="text-align:right;">
+198.5
+</td>
+<td style="text-align:right;">
+80.5
+</td>
+<td style="text-align:right;">
+19.5
+</td>
+<td style="text-align:right;">
+298.5
+</td>
+<td style="text-align:right;">
+0.6650
+</td>
+<td style="text-align:right;">
+0.2697
+</td>
+<td style="text-align:right;">
+0.0653
+</td>
+<td style="text-align:right;">
+104.6667
+</td>
+<td style="text-align:right;">
+82.3333
+</td>
+<td style="text-align:right;">
+11.0000
+</td>
+<td style="text-align:right;">
+198.0000
+</td>
+<td style="text-align:right;">
+0.5286
+</td>
+<td style="text-align:right;">
+0.4158
+</td>
+<td style="text-align:right;">
+0.0556
+</td>
+<td style="text-align:right;">
+137.3333
+</td>
+<td style="text-align:right;">
+107.3333
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+250.3333
+</td>
+<td style="text-align:right;">
+0.5486
+</td>
+<td style="text-align:right;">
+0.4288
+</td>
+<td style="text-align:right;">
+0.0226
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005013500001
+</td>
+<td style="text-align:right;">
+153.0000
+</td>
+<td style="text-align:right;">
+98.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+252.3333
+</td>
+<td style="text-align:right;">
+0.6063
+</td>
+<td style="text-align:right;">
+0.3897
+</td>
+<td style="text-align:right;">
+0.0040
+</td>
+<td style="text-align:right;">
+195.0
+</td>
+<td style="text-align:right;">
+104.0
+</td>
+<td style="text-align:right;">
+12.5
+</td>
+<td style="text-align:right;">
+311.5
+</td>
+<td style="text-align:right;">
+0.6260
+</td>
+<td style="text-align:right;">
+0.3339
+</td>
+<td style="text-align:right;">
+0.0401
+</td>
+<td style="text-align:right;">
+112.6667
+</td>
+<td style="text-align:right;">
+99.3333
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+219.0000
+</td>
+<td style="text-align:right;">
+0.5145
+</td>
+<td style="text-align:right;">
+0.4536
+</td>
+<td style="text-align:right;">
+0.0320
+</td>
+<td style="text-align:right;">
+143.6667
+</td>
+<td style="text-align:right;">
+142.3333
+</td>
+<td style="text-align:right;">
+4.6667
+</td>
+<td style="text-align:right;">
+290.6667
+</td>
+<td style="text-align:right;">
+0.4943
+</td>
+<td style="text-align:right;">
+0.4897
+</td>
+<td style="text-align:right;">
+0.0161
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005013500002
+</td>
+<td style="text-align:right;">
+82.3333
+</td>
+<td style="text-align:right;">
+53.6667
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+137.3333
+</td>
+<td style="text-align:right;">
+0.5995
+</td>
+<td style="text-align:right;">
+0.3908
+</td>
+<td style="text-align:right;">
+0.0097
+</td>
+<td style="text-align:right;">
+104.5
+</td>
+<td style="text-align:right;">
+56.5
+</td>
+<td style="text-align:right;">
+9.5
+</td>
+<td style="text-align:right;">
+170.5
+</td>
+<td style="text-align:right;">
+0.6129
+</td>
+<td style="text-align:right;">
+0.3314
+</td>
+<td style="text-align:right;">
+0.0557
+</td>
+<td style="text-align:right;">
+61.0000
+</td>
+<td style="text-align:right;">
+54.0000
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+120.6667
+</td>
+<td style="text-align:right;">
+0.5055
+</td>
+<td style="text-align:right;">
+0.4475
+</td>
+<td style="text-align:right;">
+0.0470
+</td>
+<td style="text-align:right;">
+73.0000
+</td>
+<td style="text-align:right;">
+72.3333
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+149.3333
+</td>
+<td style="text-align:right;">
+0.4888
+</td>
+<td style="text-align:right;">
+0.4844
+</td>
+<td style="text-align:right;">
+0.0268
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005027750001
+</td>
+<td style="text-align:right;">
+120.0000
+</td>
+<td style="text-align:right;">
+122.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+243.6667
+</td>
+<td style="text-align:right;">
+0.4925
+</td>
+<td style="text-align:right;">
+0.5007
+</td>
+<td style="text-align:right;">
+0.0068
+</td>
+<td style="text-align:right;">
+169.0
+</td>
+<td style="text-align:right;">
+122.5
+</td>
+<td style="text-align:right;">
+22.5
+</td>
+<td style="text-align:right;">
+314.0
+</td>
+<td style="text-align:right;">
+0.5382
+</td>
+<td style="text-align:right;">
+0.3901
+</td>
+<td style="text-align:right;">
+0.0717
+</td>
+<td style="text-align:right;">
+113.3333
+</td>
+<td style="text-align:right;">
+104.0000
+</td>
+<td style="text-align:right;">
+12.6667
+</td>
+<td style="text-align:right;">
+230.0000
+</td>
+<td style="text-align:right;">
+0.4928
+</td>
+<td style="text-align:right;">
+0.4522
+</td>
+<td style="text-align:right;">
+0.0551
+</td>
+<td style="text-align:right;">
+144.0000
+</td>
+<td style="text-align:right;">
+142.3333
+</td>
+<td style="text-align:right;">
+6.3333
+</td>
+<td style="text-align:right;">
+292.6667
+</td>
+<td style="text-align:right;">
+0.4920
+</td>
+<td style="text-align:right;">
+0.4863
+</td>
+<td style="text-align:right;">
+0.0216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750001
+</td>
+<td style="text-align:right;">
+135.0000
+</td>
+<td style="text-align:right;">
+138.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+274.6667
+</td>
+<td style="text-align:right;">
+0.4915
+</td>
+<td style="text-align:right;">
+0.5049
+</td>
+<td style="text-align:right;">
+0.0036
+</td>
+<td style="text-align:right;">
+194.0
+</td>
+<td style="text-align:right;">
+138.5
+</td>
+<td style="text-align:right;">
+15.0
+</td>
+<td style="text-align:right;">
+347.5
+</td>
+<td style="text-align:right;">
+0.5583
+</td>
+<td style="text-align:right;">
+0.3986
+</td>
+<td style="text-align:right;">
+0.0432
+</td>
+<td style="text-align:right;">
+131.6667
+</td>
+<td style="text-align:right;">
+105.6667
+</td>
+<td style="text-align:right;">
+8.3333
+</td>
+<td style="text-align:right;">
+245.6667
+</td>
+<td style="text-align:right;">
+0.5360
+</td>
+<td style="text-align:right;">
+0.4301
+</td>
+<td style="text-align:right;">
+0.0339
+</td>
+<td style="text-align:right;">
+160.3333
+</td>
+<td style="text-align:right;">
+156.3333
+</td>
+<td style="text-align:right;">
+7.3333
+</td>
+<td style="text-align:right;">
+324.0000
+</td>
+<td style="text-align:right;">
+0.4949
+</td>
+<td style="text-align:right;">
+0.4825
+</td>
+<td style="text-align:right;">
+0.0226
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750002
+</td>
+<td style="text-align:right;">
+82.6667
+</td>
+<td style="text-align:right;">
+85.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+169.3333
+</td>
+<td style="text-align:right;">
+0.4882
+</td>
+<td style="text-align:right;">
+0.5059
+</td>
+<td style="text-align:right;">
+0.0059
+</td>
+<td style="text-align:right;">
+119.0
+</td>
+<td style="text-align:right;">
+85.5
+</td>
+<td style="text-align:right;">
+10.0
+</td>
+<td style="text-align:right;">
+214.5
+</td>
+<td style="text-align:right;">
+0.5548
+</td>
+<td style="text-align:right;">
+0.3986
+</td>
+<td style="text-align:right;">
+0.0466
+</td>
+<td style="text-align:right;">
+81.0000
+</td>
+<td style="text-align:right;">
+65.3333
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+152.3333
+</td>
+<td style="text-align:right;">
+0.5317
+</td>
+<td style="text-align:right;">
+0.4289
+</td>
+<td style="text-align:right;">
+0.0394
+</td>
+<td style="text-align:right;">
+91.0000
+</td>
+<td style="text-align:right;">
+88.0000
+</td>
+<td style="text-align:right;">
+3.6667
+</td>
+<td style="text-align:right;">
+182.6667
+</td>
+<td style="text-align:right;">
+0.4982
+</td>
+<td style="text-align:right;">
+0.4818
+</td>
+<td style="text-align:right;">
+0.0201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750003
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+46.3333
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+92.6667
+</td>
+<td style="text-align:right;">
+0.4928
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.0072
+</td>
+<td style="text-align:right;">
+65.0
+</td>
+<td style="text-align:right;">
+47.0
+</td>
+<td style="text-align:right;">
+6.5
+</td>
+<td style="text-align:right;">
+118.5
+</td>
+<td style="text-align:right;">
+0.5485
+</td>
+<td style="text-align:right;">
+0.3966
+</td>
+<td style="text-align:right;">
+0.0549
+</td>
+<td style="text-align:right;">
+44.6667
+</td>
+<td style="text-align:right;">
+36.0000
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+84.6667
+</td>
+<td style="text-align:right;">
+0.5276
+</td>
+<td style="text-align:right;">
+0.4252
+</td>
+<td style="text-align:right;">
+0.0472
+</td>
+<td style="text-align:right;">
+53.0000
+</td>
+<td style="text-align:right;">
+51.3333
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+107.0000
+</td>
+<td style="text-align:right;">
+0.4953
+</td>
+<td style="text-align:right;">
+0.4798
+</td>
+<td style="text-align:right;">
+0.0249
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750004
+</td>
+<td style="text-align:right;">
+62.6667
+</td>
+<td style="text-align:right;">
+64.3333
+</td>
+<td style="text-align:right;">
+2.0000
+</td>
+<td style="text-align:right;">
+129.0000
+</td>
+<td style="text-align:right;">
+0.4858
+</td>
+<td style="text-align:right;">
+0.4987
+</td>
+<td style="text-align:right;">
+0.0155
+</td>
+<td style="text-align:right;">
+89.5
+</td>
+<td style="text-align:right;">
+64.0
+</td>
+<td style="text-align:right;">
+10.0
+</td>
+<td style="text-align:right;">
+163.5
+</td>
+<td style="text-align:right;">
+0.5474
+</td>
+<td style="text-align:right;">
+0.3914
+</td>
+<td style="text-align:right;">
+0.0612
+</td>
+<td style="text-align:right;">
+61.0000
+</td>
+<td style="text-align:right;">
+49.3333
+</td>
+<td style="text-align:right;">
+6.0000
+</td>
+<td style="text-align:right;">
+116.3333
+</td>
+<td style="text-align:right;">
+0.5244
+</td>
+<td style="text-align:right;">
+0.4241
+</td>
+<td style="text-align:right;">
+0.0516
+</td>
+<td style="text-align:right;">
+72.3333
+</td>
+<td style="text-align:right;">
+70.3333
+</td>
+<td style="text-align:right;">
+5.0000
+</td>
+<td style="text-align:right;">
+147.6667
+</td>
+<td style="text-align:right;">
+0.4898
+</td>
+<td style="text-align:right;">
+0.4763
+</td>
+<td style="text-align:right;">
+0.0339
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750005
+</td>
+<td style="text-align:right;">
+132.6667
+</td>
+<td style="text-align:right;">
+136.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+270.6667
+</td>
+<td style="text-align:right;">
+0.4901
+</td>
+<td style="text-align:right;">
+0.5037
+</td>
+<td style="text-align:right;">
+0.0062
+</td>
+<td style="text-align:right;">
+190.5
+</td>
+<td style="text-align:right;">
+136.5
+</td>
+<td style="text-align:right;">
+18.5
+</td>
+<td style="text-align:right;">
+345.5
+</td>
+<td style="text-align:right;">
+0.5514
+</td>
+<td style="text-align:right;">
+0.3951
+</td>
+<td style="text-align:right;">
+0.0535
+</td>
+<td style="text-align:right;">
+129.6667
+</td>
+<td style="text-align:right;">
+104.6667
+</td>
+<td style="text-align:right;">
+10.3333
+</td>
+<td style="text-align:right;">
+244.6667
+</td>
+<td style="text-align:right;">
+0.5300
+</td>
+<td style="text-align:right;">
+0.4278
+</td>
+<td style="text-align:right;">
+0.0422
+</td>
+<td style="text-align:right;">
+162.3333
+</td>
+<td style="text-align:right;">
+160.6667
+</td>
+<td style="text-align:right;">
+7.3333
+</td>
+<td style="text-align:right;">
+330.3333
+</td>
+<td style="text-align:right;">
+0.4914
+</td>
+<td style="text-align:right;">
+0.4864
+</td>
+<td style="text-align:right;">
+0.0222
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750006
+</td>
+<td style="text-align:right;">
+15.0000
+</td>
+<td style="text-align:right;">
+15.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+30.3333
+</td>
+<td style="text-align:right;">
+0.4945
+</td>
+<td style="text-align:right;">
+0.5055
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+22.0
+</td>
+<td style="text-align:right;">
+15.5
+</td>
+<td style="text-align:right;">
+1.0
+</td>
+<td style="text-align:right;">
+38.5
+</td>
+<td style="text-align:right;">
+0.5714
+</td>
+<td style="text-align:right;">
+0.4026
+</td>
+<td style="text-align:right;">
+0.0260
+</td>
+<td style="text-align:right;">
+14.6667
+</td>
+<td style="text-align:right;">
+12.0000
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+26.6667
+</td>
+<td style="text-align:right;">
+0.5500
+</td>
+<td style="text-align:right;">
+0.4500
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+16.6667
+</td>
+<td style="text-align:right;">
+16.6667
+</td>
+<td style="text-align:right;">
+0.3333
+</td>
+<td style="text-align:right;">
+33.6667
+</td>
+<td style="text-align:right;">
+0.4950
+</td>
+<td style="text-align:right;">
+0.4950
+</td>
+<td style="text-align:right;">
+0.0099
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005048750007
+</td>
+<td style="text-align:right;">
+48.0000
+</td>
+<td style="text-align:right;">
+48.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+96.6667
+</td>
+<td style="text-align:right;">
+0.4966
+</td>
+<td style="text-align:right;">
+0.5034
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+69.0
+</td>
+<td style="text-align:right;">
+49.0
+</td>
+<td style="text-align:right;">
+4.5
+</td>
+<td style="text-align:right;">
+122.5
+</td>
+<td style="text-align:right;">
+0.5633
+</td>
+<td style="text-align:right;">
+0.4000
+</td>
+<td style="text-align:right;">
+0.0367
+</td>
+<td style="text-align:right;">
+46.6667
+</td>
+<td style="text-align:right;">
+37.3333
+</td>
+<td style="text-align:right;">
+2.3333
+</td>
+<td style="text-align:right;">
+86.3333
+</td>
+<td style="text-align:right;">
+0.5405
+</td>
+<td style="text-align:right;">
+0.4324
+</td>
+<td style="text-align:right;">
+0.0270
+</td>
+<td style="text-align:right;">
+59.6667
+</td>
+<td style="text-align:right;">
+58.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+119.3333
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.4860
+</td>
+<td style="text-align:right;">
+0.0140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005049000001
+</td>
+<td style="text-align:right;">
+109.6667
+</td>
+<td style="text-align:right;">
+44.6667
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+154.3333
+</td>
+<td style="text-align:right;">
+0.7106
+</td>
+<td style="text-align:right;">
+0.2894
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+122.0
+</td>
+<td style="text-align:right;">
+52.5
+</td>
+<td style="text-align:right;">
+5.5
+</td>
+<td style="text-align:right;">
+180.0
+</td>
+<td style="text-align:right;">
+0.6778
+</td>
+<td style="text-align:right;">
+0.2917
+</td>
+<td style="text-align:right;">
+0.0306
+</td>
+<td style="text-align:right;">
+88.0000
+</td>
+<td style="text-align:right;">
+43.0000
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+135.0000
+</td>
+<td style="text-align:right;">
+0.6519
+</td>
+<td style="text-align:right;">
+0.3185
+</td>
+<td style="text-align:right;">
+0.0296
+</td>
+<td style="text-align:right;">
+120.0000
+</td>
+<td style="text-align:right;">
+63.0000
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+184.3333
+</td>
+<td style="text-align:right;">
+0.6510
+</td>
+<td style="text-align:right;">
+0.3418
+</td>
+<td style="text-align:right;">
+0.0072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005049000002
+</td>
+<td style="text-align:right;">
+115.0000
+</td>
+<td style="text-align:right;">
+47.3333
+</td>
+<td style="text-align:right;">
+1.3333
+</td>
+<td style="text-align:right;">
+163.6667
+</td>
+<td style="text-align:right;">
+0.7026
+</td>
+<td style="text-align:right;">
+0.2892
+</td>
+<td style="text-align:right;">
+0.0081
+</td>
+<td style="text-align:right;">
+127.5
+</td>
+<td style="text-align:right;">
+56.0
+</td>
+<td style="text-align:right;">
+10.0
+</td>
+<td style="text-align:right;">
+193.5
+</td>
+<td style="text-align:right;">
+0.6589
+</td>
+<td style="text-align:right;">
+0.2894
+</td>
+<td style="text-align:right;">
+0.0517
+</td>
+<td style="text-align:right;">
+92.6667
+</td>
+<td style="text-align:right;">
+45.6667
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+145.3333
+</td>
+<td style="text-align:right;">
+0.6376
+</td>
+<td style="text-align:right;">
+0.3142
+</td>
+<td style="text-align:right;">
+0.0482
+</td>
+<td style="text-align:right;">
+128.3333
+</td>
+<td style="text-align:right;">
+68.3333
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+201.0000
+</td>
+<td style="text-align:right;">
+0.6385
+</td>
+<td style="text-align:right;">
+0.3400
+</td>
+<td style="text-align:right;">
+0.0216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005056500001
+</td>
+<td style="text-align:right;">
+160.6667
+</td>
+<td style="text-align:right;">
+148.6667
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+310.3333
+</td>
+<td style="text-align:right;">
+0.5177
+</td>
+<td style="text-align:right;">
+0.4791
+</td>
+<td style="text-align:right;">
+0.0032
+</td>
+<td style="text-align:right;">
+225.0
+</td>
+<td style="text-align:right;">
+140.5
+</td>
+<td style="text-align:right;">
+14.5
+</td>
+<td style="text-align:right;">
+380.0
+</td>
+<td style="text-align:right;">
+0.5921
+</td>
+<td style="text-align:right;">
+0.3697
+</td>
+<td style="text-align:right;">
+0.0382
+</td>
+<td style="text-align:right;">
+148.3333
+</td>
+<td style="text-align:right;">
+106.6667
+</td>
+<td style="text-align:right;">
+9.0000
+</td>
+<td style="text-align:right;">
+264.0000
+</td>
+<td style="text-align:right;">
+0.5619
+</td>
+<td style="text-align:right;">
+0.4040
+</td>
+<td style="text-align:right;">
+0.0341
+</td>
+<td style="text-align:right;">
+169.3333
+</td>
+<td style="text-align:right;">
+162.0000
+</td>
+<td style="text-align:right;">
+7.3333
+</td>
+<td style="text-align:right;">
+338.6667
+</td>
+<td style="text-align:right;">
+0.5000
+</td>
+<td style="text-align:right;">
+0.4783
+</td>
+<td style="text-align:right;">
+0.0217
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005122500001
+</td>
+<td style="text-align:right;">
+216.0000
+</td>
+<td style="text-align:right;">
+170.0000
+</td>
+<td style="text-align:right;">
+3.3333
+</td>
+<td style="text-align:right;">
+389.3333
+</td>
+<td style="text-align:right;">
+0.5548
+</td>
+<td style="text-align:right;">
+0.4366
+</td>
+<td style="text-align:right;">
+0.0086
+</td>
+<td style="text-align:right;">
+314.0
+</td>
+<td style="text-align:right;">
+171.5
+</td>
+<td style="text-align:right;">
+26.0
+</td>
+<td style="text-align:right;">
+511.5
+</td>
+<td style="text-align:right;">
+0.6139
+</td>
+<td style="text-align:right;">
+0.3353
+</td>
+<td style="text-align:right;">
+0.0508
+</td>
+<td style="text-align:right;">
+187.6667
+</td>
+<td style="text-align:right;">
+146.6667
+</td>
+<td style="text-align:right;">
+16.3333
+</td>
+<td style="text-align:right;">
+350.6667
+</td>
+<td style="text-align:right;">
+0.5352
+</td>
+<td style="text-align:right;">
+0.4183
+</td>
+<td style="text-align:right;">
+0.0466
+</td>
+<td style="text-align:right;">
+236.0000
+</td>
+<td style="text-align:right;">
+201.3333
+</td>
+<td style="text-align:right;">
+9.3333
+</td>
+<td style="text-align:right;">
+446.6667
+</td>
+<td style="text-align:right;">
+0.5284
+</td>
+<td style="text-align:right;">
+0.4507
+</td>
+<td style="text-align:right;">
+0.0209
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005122500002
+</td>
+<td style="text-align:right;">
+80.0000
+</td>
+<td style="text-align:right;">
+63.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+144.3333
+</td>
+<td style="text-align:right;">
+0.5543
+</td>
+<td style="text-align:right;">
+0.4388
+</td>
+<td style="text-align:right;">
+0.0069
+</td>
+<td style="text-align:right;">
+116.5
+</td>
+<td style="text-align:right;">
+63.5
+</td>
+<td style="text-align:right;">
+9.5
+</td>
+<td style="text-align:right;">
+189.5
+</td>
+<td style="text-align:right;">
+0.6148
+</td>
+<td style="text-align:right;">
+0.3351
+</td>
+<td style="text-align:right;">
+0.0501
+</td>
+<td style="text-align:right;">
+69.6667
+</td>
+<td style="text-align:right;">
+54.0000
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+129.0000
+</td>
+<td style="text-align:right;">
+0.5401
+</td>
+<td style="text-align:right;">
+0.4186
+</td>
+<td style="text-align:right;">
+0.0413
+</td>
+<td style="text-align:right;">
+85.3333
+</td>
+<td style="text-align:right;">
+73.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+160.3333
+</td>
+<td style="text-align:right;">
+0.5322
+</td>
+<td style="text-align:right;">
+0.4574
+</td>
+<td style="text-align:right;">
+0.0104
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005122500003
+</td>
+<td style="text-align:right;">
+37.3333
+</td>
+<td style="text-align:right;">
+29.3333
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+66.6667
+</td>
+<td style="text-align:right;">
+0.5600
+</td>
+<td style="text-align:right;">
+0.4400
+</td>
+<td style="text-align:right;">
+0.0000
+</td>
+<td style="text-align:right;">
+54.5
+</td>
+<td style="text-align:right;">
+29.5
+</td>
+<td style="text-align:right;">
+2.5
+</td>
+<td style="text-align:right;">
+86.5
+</td>
+<td style="text-align:right;">
+0.6301
+</td>
+<td style="text-align:right;">
+0.3410
+</td>
+<td style="text-align:right;">
+0.0289
+</td>
+<td style="text-align:right;">
+32.3333
+</td>
+<td style="text-align:right;">
+25.0000
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+59.0000
+</td>
+<td style="text-align:right;">
+0.5480
+</td>
+<td style="text-align:right;">
+0.4237
+</td>
+<td style="text-align:right;">
+0.0282
+</td>
+<td style="text-align:right;">
+43.3333
+</td>
+<td style="text-align:right;">
+35.6667
+</td>
+<td style="text-align:right;">
+0.6667
+</td>
+<td style="text-align:right;">
+79.6667
+</td>
+<td style="text-align:right;">
+0.5439
+</td>
+<td style="text-align:right;">
+0.4477
+</td>
+<td style="text-align:right;">
+0.0084
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005135000001
+</td>
+<td style="text-align:right;">
+406.6667
+</td>
+<td style="text-align:right;">
+221.6667
+</td>
+<td style="text-align:right;">
+2.6667
+</td>
+<td style="text-align:right;">
+631.0000
+</td>
+<td style="text-align:right;">
+0.6445
+</td>
+<td style="text-align:right;">
+0.3513
+</td>
+<td style="text-align:right;">
+0.0042
+</td>
+<td style="text-align:right;">
+469.0
+</td>
+<td style="text-align:right;">
+211.0
+</td>
+<td style="text-align:right;">
+15.5
+</td>
+<td style="text-align:right;">
+695.5
+</td>
+<td style="text-align:right;">
+0.6743
+</td>
+<td style="text-align:right;">
+0.3034
+</td>
+<td style="text-align:right;">
+0.0223
+</td>
+<td style="text-align:right;">
+325.3333
+</td>
+<td style="text-align:right;">
+185.6667
+</td>
+<td style="text-align:right;">
+17.0000
+</td>
+<td style="text-align:right;">
+527.6667
+</td>
+<td style="text-align:right;">
+0.6166
+</td>
+<td style="text-align:right;">
+0.3519
+</td>
+<td style="text-align:right;">
+0.0322
+</td>
+<td style="text-align:right;">
+358.6667
+</td>
+<td style="text-align:right;">
+247.6667
+</td>
+<td style="text-align:right;">
+7.0000
+</td>
+<td style="text-align:right;">
+613.3333
+</td>
+<td style="text-align:right;">
+0.5848
+</td>
+<td style="text-align:right;">
+0.4038
+</td>
+<td style="text-align:right;">
+0.0114
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005143250001
+</td>
+<td style="text-align:right;">
+110.0000
+</td>
+<td style="text-align:right;">
+91.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+202.0000
+</td>
+<td style="text-align:right;">
+0.5446
+</td>
+<td style="text-align:right;">
+0.4505
+</td>
+<td style="text-align:right;">
+0.0050
+</td>
+<td style="text-align:right;">
+147.0
+</td>
+<td style="text-align:right;">
+99.0
+</td>
+<td style="text-align:right;">
+12.5
+</td>
+<td style="text-align:right;">
+258.5
+</td>
+<td style="text-align:right;">
+0.5687
+</td>
+<td style="text-align:right;">
+0.3830
+</td>
+<td style="text-align:right;">
+0.0484
+</td>
+<td style="text-align:right;">
+95.6667
+</td>
+<td style="text-align:right;">
+72.6667
+</td>
+<td style="text-align:right;">
+10.6667
+</td>
+<td style="text-align:right;">
+179.0000
+</td>
+<td style="text-align:right;">
+0.5345
+</td>
+<td style="text-align:right;">
+0.4060
+</td>
+<td style="text-align:right;">
+0.0596
+</td>
+<td style="text-align:right;">
+124.3333
+</td>
+<td style="text-align:right;">
+108.0000
+</td>
+<td style="text-align:right;">
+4.0000
+</td>
+<td style="text-align:right;">
+236.3333
+</td>
+<td style="text-align:right;">
+0.5261
+</td>
+<td style="text-align:right;">
+0.4570
+</td>
+<td style="text-align:right;">
+0.0169
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005143250002
+</td>
+<td style="text-align:right;">
+108.0000
+</td>
+<td style="text-align:right;">
+89.0000
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+198.0000
+</td>
+<td style="text-align:right;">
+0.5455
+</td>
+<td style="text-align:right;">
+0.4495
+</td>
+<td style="text-align:right;">
+0.0051
+</td>
+<td style="text-align:right;">
+144.0
+</td>
+<td style="text-align:right;">
+97.0
+</td>
+<td style="text-align:right;">
+12.0
+</td>
+<td style="text-align:right;">
+253.0
+</td>
+<td style="text-align:right;">
+0.5692
+</td>
+<td style="text-align:right;">
+0.3834
+</td>
+<td style="text-align:right;">
+0.0474
+</td>
+<td style="text-align:right;">
+93.6667
+</td>
+<td style="text-align:right;">
+70.6667
+</td>
+<td style="text-align:right;">
+10.6667
+</td>
+<td style="text-align:right;">
+175.0000
+</td>
+<td style="text-align:right;">
+0.5352
+</td>
+<td style="text-align:right;">
+0.4038
+</td>
+<td style="text-align:right;">
+0.0610
+</td>
+<td style="text-align:right;">
+115.6667
+</td>
+<td style="text-align:right;">
+101.3333
+</td>
+<td style="text-align:right;">
+3.6667
+</td>
+<td style="text-align:right;">
+220.6667
+</td>
+<td style="text-align:right;">
+0.5242
+</td>
+<td style="text-align:right;">
+0.4592
+</td>
+<td style="text-align:right;">
+0.0166
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005143250003
+</td>
+<td style="text-align:right;">
+103.3333
+</td>
+<td style="text-align:right;">
+86.3333
+</td>
+<td style="text-align:right;">
+1.0000
+</td>
+<td style="text-align:right;">
+190.6667
+</td>
+<td style="text-align:right;">
+0.5420
+</td>
+<td style="text-align:right;">
+0.4528
+</td>
+<td style="text-align:right;">
+0.0052
+</td>
+<td style="text-align:right;">
+138.5
+</td>
+<td style="text-align:right;">
+92.5
+</td>
+<td style="text-align:right;">
+11.5
+</td>
+<td style="text-align:right;">
+242.5
+</td>
+<td style="text-align:right;">
+0.5711
+</td>
+<td style="text-align:right;">
+0.3814
+</td>
+<td style="text-align:right;">
+0.0474
+</td>
+<td style="text-align:right;">
+90.6667
+</td>
+<td style="text-align:right;">
+67.6667
+</td>
+<td style="text-align:right;">
+10.0000
+</td>
+<td style="text-align:right;">
+168.3333
+</td>
+<td style="text-align:right;">
+0.5386
+</td>
+<td style="text-align:right;">
+0.4020
+</td>
+<td style="text-align:right;">
+0.0594
+</td>
+<td style="text-align:right;">
+108.3333
+</td>
+<td style="text-align:right;">
+91.6667
+</td>
+<td style="text-align:right;">
+5.3333
+</td>
+<td style="text-align:right;">
+205.3333
+</td>
+<td style="text-align:right;">
+0.5276
+</td>
+<td style="text-align:right;">
+0.4464
+</td>
+<td style="text-align:right;">
+0.0260
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005143250004
+</td>
+<td style="text-align:right;">
+102.6667
+</td>
+<td style="text-align:right;">
+85.3333
+</td>
+<td style="text-align:right;">
+1.6667
+</td>
+<td style="text-align:right;">
+189.6667
+</td>
+<td style="text-align:right;">
+0.5413
+</td>
+<td style="text-align:right;">
+0.4499
+</td>
+<td style="text-align:right;">
+0.0088
+</td>
+<td style="text-align:right;">
+137.0
+</td>
+<td style="text-align:right;">
+92.5
+</td>
+<td style="text-align:right;">
+14.0
+</td>
+<td style="text-align:right;">
+243.5
+</td>
+<td style="text-align:right;">
+0.5626
+</td>
+<td style="text-align:right;">
+0.3799
+</td>
+<td style="text-align:right;">
+0.0575
+</td>
+<td style="text-align:right;">
+90.0000
+</td>
+<td style="text-align:right;">
+68.3333
+</td>
+<td style="text-align:right;">
+11.6667
+</td>
+<td style="text-align:right;">
+170.0000
+</td>
+<td style="text-align:right;">
+0.5294
+</td>
+<td style="text-align:right;">
+0.4020
+</td>
+<td style="text-align:right;">
+0.0686
+</td>
+<td style="text-align:right;">
+109.6667
+</td>
+<td style="text-align:right;">
+95.3333
+</td>
+<td style="text-align:right;">
+5.6667
+</td>
+<td style="text-align:right;">
+210.6667
+</td>
+<td style="text-align:right;">
+0.5206
+</td>
+<td style="text-align:right;">
+0.4525
+</td>
+<td style="text-align:right;">
+0.0269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+55005143500001
+</td>
+<td style="text-align:right;">
+320.3333
+</td>
+<td style="text-align:right;">
+228.3333
+</td>
+<td style="text-align:right;">
+4.3333
+</td>
+<td style="text-align:right;">
+553.0000
+</td>
+<td style="text-align:right;">
+0.5793
+</td>
+<td style="text-align:right;">
+0.4129
+</td>
+<td style="text-align:right;">
+0.0078
+</td>
+<td style="text-align:right;">
+384.5
+</td>
+<td style="text-align:right;">
+229.5
+</td>
+<td style="text-align:right;">
+19.5
+</td>
+<td style="text-align:right;">
+633.5
+</td>
+<td style="text-align:right;">
+0.6069
+</td>
+<td style="text-align:right;">
+0.3623
+</td>
+<td style="text-align:right;">
+0.0308
+</td>
+<td style="text-align:right;">
+281.6667
+</td>
+<td style="text-align:right;">
+188.6667
+</td>
+<td style="text-align:right;">
+12.0000
+</td>
+<td style="text-align:right;">
+482.3333
+</td>
+<td style="text-align:right;">
+0.5840
+</td>
+<td style="text-align:right;">
+0.3912
+</td>
+<td style="text-align:right;">
+0.0249
+</td>
+<td style="text-align:right;">
+323.6667
+</td>
+<td style="text-align:right;">
+263.3333
+</td>
+<td style="text-align:right;">
+12.6667
+</td>
+<td style="text-align:right;">
+599.6667
+</td>
+<td style="text-align:right;">
+0.5397
+</td>
+<td style="text-align:right;">
+0.4391
+</td>
+<td style="text-align:right;">
+0.0211
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">#FIXME </span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">#dc %&lt;&gt;% left_join(partisanship)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="co"># dc %&gt;% </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="co">#   select(bioname, GEO_ID, starts_with(&quot;Rep&quot;), starts_with(&quot;Dem&quot;), starts_with(&quot;Oth&quot;)) %&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co">#   kablebox()</span></span></code></pre></div>
 <p>TODO</p>
+</div>
+<div id="save-as-rds-csv" class="section level2">
+<h2>Save as rds csv</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>dc</span></code></pre></div>
+<pre><code>## # A tibble: 361 x 62
+##    file  speech_id icpsr date        year congress chamber bioname pattern
+##    &lt;chr&gt; &lt;chr&gt;     &lt;int&gt; &lt;date&gt;     &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+##  1 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  2 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  3 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  4 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  5 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  6 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  7 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  8 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+##  9 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+## 10 CREC… 000108    20537 2020-07-09  2020      116 House   MOORE,… &quot;gwend…
+## # … with 351 more rows, and 53 more variables: first_name &lt;chr&gt;,
+## #   first_initial &lt;chr&gt;, common_name &lt;chr&gt;, middle_name &lt;chr&gt;,
+## #   middle_initial &lt;chr&gt;, maiden_name &lt;chr&gt;, last_name &lt;chr&gt;,
+## #   add_last_name &lt;chr&gt;, id &lt;chr&gt;, party_code &lt;int&gt;, cqlabel &lt;chr&gt;,
+## #   state &lt;chr&gt;, state_abbrev &lt;chr&gt;, bioImgURL &lt;chr&gt;, seo_name &lt;chr&gt;,
+## #   district_code &lt;dbl&gt;, party_name &lt;chr&gt;, nominate.dim2 &lt;dbl&gt;,
+## #   nominate.dim1 &lt;dbl&gt;, nominate.geo_mean_probability &lt;dbl&gt;, party_size &lt;int&gt;,
+## #   first_last &lt;chr&gt;, first_maiden &lt;chr&gt;, common_last &lt;chr&gt;,
+## #   first_middle_last &lt;chr&gt;, first_initial_last &lt;chr&gt;,
+## #   common_middle_last &lt;chr&gt;, last &lt;chr&gt;, last_comma_first &lt;chr&gt;,
+## #   last_first &lt;chr&gt;, first_maiden_last &lt;chr&gt;,
+## #   common_middle_initial_last &lt;chr&gt;, common_maiden &lt;chr&gt;,
+## #   commoninitial_last &lt;chr&gt;, first_middle_initial_last &lt;chr&gt;,
+## #   firstinitial_middleinitial_last &lt;chr&gt;, last_comma_initial &lt;chr&gt;,
+## #   last_comma_commoninitial &lt;chr&gt;, last_comma_common &lt;chr&gt;,
+## #   maiden_comma_first &lt;chr&gt;, maiden_comma_firstinitial &lt;chr&gt;,
+## #   chamber_last &lt;chr&gt;, from &lt;int&gt;, facebook_sci &lt;int&gt;, flow_count &lt;int&gt;,
+## #   GEO_ID &lt;chr&gt;, NAME &lt;chr&gt;, name &lt;chr&gt;, value &lt;dbl&gt;, format &lt;chr&gt;,
+## #   type &lt;chr&gt;, measure &lt;chr&gt;, group &lt;chr&gt;</code></pre>
 </div>
 </div>
 

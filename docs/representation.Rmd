@@ -178,7 +178,8 @@ dem_names %<>%
 
 # pivot data
 dem %<>% 
-  pivot_longer(!NAME) %>% 
+  group_by(NAME, GEO_ID) %>%
+  pivot_longer(starts_with("SF")) %>% 
   mutate(state = str_remove(NAME, ".*, ") %>% str_to_lower(),
          district_code = str_extract(NAME, "District [0-9]*") %>% 
            str_remove("District ") %>% as.numeric()) %>% 
@@ -206,6 +207,24 @@ dc %>%
 
 ## Partisanship
 
+```{r}
+partisanship <- read_csv(here::here("data", "2020_11_23_WI_WARD_PARTISANSHIP_SIMPLE.csv")) #FIXME %>% mutate(district_code = str_sub(GEO_ID, -2) %>% as.integer() )
+
+partisanship %>% kablebox()
+
+#FIXME 
+#dc %<>% left_join(partisanship)
+
+# dc %>% 
+#   select(bioname, GEO_ID, starts_with("Rep"), starts_with("Dem"), starts_with("Oth")) %>%
+#   kablebox()
+```
+
 TODO
 
 
+## Save as rds csv
+
+```{r}
+dc
+```
