@@ -162,7 +162,47 @@ dc %>% count(bioname, cqlabel, flow_count, facebook_sci, name = "speeches_n") %>
 
 ## Demographics
 
-TODO
+```{r}
+dem <- read_csv(here::here("data", "CD_DEMO_DATA", "115CD_DEMOGRAPHIC_SUMMARY_ACS_2010_CENSUS_1YR_EST.csv"))
+
+# the first 4 rows are metadata for values
+dem_names <- head(dem, 4) 
+
+# pivot value names
+dem_names %<>% 
+  mutate(NAME = c("format", "type", "measure", "group") ) %>%
+  group_by(NAME) %>% 
+  pivot_longer(!NAME) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = NAME)
+
+# pivot data
+dem %<>% 
+  pivot_longer(!NAME) %>% 
+  mutate(state = str_remove(NAME, ".*, ") %>% str_to_lower(),
+         district_code = str_extract(NAME, "District [0-9]*") %>% 
+           str_remove("District ") %>% as.numeric()) %>% 
+  # drop non-values 
+  mutate(value = as.numeric(value)) %>% filter(!is.na(value)) %>%
+  #join value names
+  left_join(dem_names)
+
+# demographic variables
+dem %>% 
+  distinct(type, measure, group) %>%
+  kablebox()
+
+
+# join demographics to speech and community data
+dc %<>% left_join(dem) 
+
+dc %>% 
+  filter(format == "Percent"#, type == "RACE"
+         ) %>% 
+  select(bioname, cqlabel, type,  group, measure, value, format) %>% 
+  distinct() %>%
+  kablebox()
+```
 
 ## Partisanship
 
