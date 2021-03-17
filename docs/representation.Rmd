@@ -106,6 +106,8 @@ d %>%
 d %<>% filter(state == "wisconsin",
              chamber == "House")
 
+d %<>% group_by(icpsr) %>% add_count(name = "speeches_n") 
+
 
 d %>% 
   select(bioname, cqlabel, icpsr, file) %>% 
@@ -114,7 +116,7 @@ d %>%
 ```
 
 
-### TODO
+TODO
 
 - [ ] identify WI House members who were up for reelection in 2020
 
@@ -123,6 +125,8 @@ d %>%
 - [ ] measure *level* of attention to district (mentions of home state, district, etc.)
 
 - [ ] measure *ratio*/log odds of "my district" vs "my conscience" etc.
+
+---
 
 # District characteristics 
 
@@ -148,16 +152,17 @@ c <- full_join(fb, flow)
 c %>% kablebox()
 ```
 
-## Merge speeches and within-district connectivity
+### Merge in within-district connectivity
+
 ```{r}
 within <- c %>% filter(from == to)
 
 
-dc <- d %>% left_join(within,
+d2 <- d %>% left_join(within,
                 by = c("district_code" = "to")) %>% filter(!is.na(flow_count)) 
 
 # number of speeches
-dc %>% count(bioname, cqlabel, flow_count, facebook_sci, name = "speeches_n") %>% kablebox()
+d2 %>% distinct(bioname, cqlabel, flow_count, facebook_sci, speeches_n) %>% kablebox()
 ```
 
 ## Demographics
@@ -192,12 +197,14 @@ dem %<>%
 dem %>% 
   distinct(type, measure, group) %>%
   kablebox()
+```
 
-
+### Merge in Census Demographics
+```{r}
 # join demographics to speech and community data
-dc %<>% left_join(dem) 
+d2 %<>% left_join(dem) 
 
-dc %>% 
+d2 %>% 
   filter(format == "Percent"#, type == "RACE"
          ) %>% 
   select(bioname, cqlabel, type,  group, measure, value, format) %>% 
@@ -205,26 +212,54 @@ dc %>%
   kablebox()
 ```
 
+---
+
 ## Partisanship
 
 ```{r}
-partisanship <- read_csv(here::here("data", "2020_11_23_WI_WARD_PARTISANSHIP_SIMPLE.csv")) #FIXME %>% mutate(district_code = str_sub(GEO_ID, -2) %>% as.integer() )
+partisanship <- read_csv(here::here("data", "WI_FULL_WARD_ELECTORAL_DATA_02_TO_18.csv")) %>% 
+  mutate(district_code = CON %>% as.integer() ) %>% 
+  select(-NAME)
 
 partisanship %>% kablebox()
 
-#FIXME 
-#dc %<>% left_join(partisanship)
+# aggregate to district 
+partisanship_agg <- partisanship %>% 
+  group_by(district_code) %>% 
+  # for example, sum cumulative patisanship vars
+  summarise(across(contains("_CUM_") | BLACK|WHITE|HISPANIC| ASIAN|AMINDIAN, sum))
+```
+ 
+### Merge in partisanship
+```{r}
+d3 <- d2 %>% left_join(partisanship_agg)
 
-# dc %>% 
-#   select(bioname, GEO_ID, starts_with("Rep"), starts_with("Dem"), starts_with("Oth")) %>%
-#   kablebox()
+d3 %>%
+  select(bioname, district_code, icpsr,
+         # speech
+         speeches_n, file,
+         # community
+         facebook_sci, flow_count,
+         # race 
+          BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,
+         # partisanship
+         starts_with("REP"), starts_with("DEM"), starts_with("OTH")) %>%
+  distinct() %>% 
+  kablebox()
 ```
 
-TODO
 
-
-## Save as rds csv
+# Docs 
 
 ```{r}
-dc
+tibble(variable = names(d3),
+       class = purrr::map_df(d3, class) %>% unlist(., use.names=FALSE),
+       example = d3 %>% slice(2) %>% 
+           unlist(., use.names=FALSE)) %>% kablebox()
+```
+
+# Save as .Rdata and .csv
+
+```{r}
+#dc
 ```
