@@ -253,15 +253,22 @@ d3 %>%
 # Docs 
 
 ```{r}
-docs <- d2 %>% slice(2) %>% left_join(partisanship)
+docs <- d2 %>% slice(2) %>%
+  #FIXME when we figure out long/wide format 
+  left_join(partisanship)
 
-tibble(variable = names(docs),
-       class = purrr::map_df(docs, class) %>%
-         unlist(., use.names=FALSE),
-       example = docs %>% slice(1) %>% 
-           unlist(., use.names=FALSE)
-       ) %>% 
-  kablebox()
+docs <- tibble(
+  variable = names(docs),
+  class = purrr::map_df(docs, class) %>%
+    unlist(., use.names=FALSE),
+  example = docs %>% slice(1) %>% 
+    unlist(., use.names=FALSE)
+       ) 
+
+docs %>% 
+  kable() %>% 
+  kable_styling() %>% 
+  scroll_box(height = "600px")
 ```
 
 # Save as .Rdata and .csv
