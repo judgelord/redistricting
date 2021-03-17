@@ -191,7 +191,8 @@ dem %<>%
   # drop non-values 
   mutate(value = as.numeric(value)) %>% filter(!is.na(value)) %>%
   #join value names
-  left_join(dem_names)
+  left_join(dem_names) %>% 
+  rename(district_name = NAME)
 
 # demographic variables
 dem %>% 
@@ -230,7 +231,7 @@ partisanship_agg <- partisanship %>%
   summarise(across(contains("_CUM_") | BLACK|WHITE|HISPANIC| ASIAN|AMINDIAN, sum))
 ```
  
-### Merge in partisanship
+### Merge in aggregate partisanship
 ```{r}
 d3 <- d2 %>% left_join(partisanship_agg)
 
@@ -252,10 +253,15 @@ d3 %>%
 # Docs 
 
 ```{r}
-tibble(variable = names(d3),
-       class = purrr::map_df(d3, class) %>% unlist(., use.names=FALSE),
-       example = d3 %>% slice(2) %>% 
-           unlist(., use.names=FALSE)) %>% kablebox()
+docs <- d2 %>% slice(2) %>% left_join(partisanship)
+
+tibble(variable = names(docs),
+       class = purrr::map_df(docs, class) %>%
+         unlist(., use.names=FALSE),
+       example = docs %>% slice(1) %>% 
+           unlist(., use.names=FALSE)
+       ) %>% 
+  kablebox()
 ```
 
 # Save as .Rdata and .csv
