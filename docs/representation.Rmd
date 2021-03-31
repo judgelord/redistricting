@@ -51,23 +51,23 @@ kablebox <- . %>%
   scroll_box(height = "400px")
 ```
 
-# Congressional record parsed by speaker
+# Member characteristics
 
-## Directory structure
+## Congressional record parsed by speaker
 
-In the data/txt folder:
+Directory structure of the data/txt folder:
 ```{r}
 cr_file <- list.files(here::here("data", "txt") %>% 
                         str_replace("redistricting", "Congressional records/cr"),
                       recursive = T) 
 
-cr_file %>% kablebox()
+tibble(file = cr_file) %>% kablebox()
 ```
 
 
-## Merge in voteview data 
+## Merge in voteview data
 
-by legislator ICPSR id and congress
+by Congress and legislator ICPSR identifier linking to DW-NOMINATE spatial ideology scores based on voting record 
 
 ```{r}
 d <- tibble(file = cr_file %>% str_remove(".*/"),
@@ -90,7 +90,10 @@ d %<>% mutate(congress = as.numeric(round((year - 2001.1)/2)) + 107) # the 107th
 # Devin's members data (expanded from voteview)
 load(here("data", "members.Rdata"))
 
-d %<>% left_join(members)
+d %<>% left_join(members) 
+
+# drop name varients
+d %<>% select(-contains("first"), -contains("common"), -contains("middle"), -contains("last"), -contains("maiden"))
 
 d %>% 
   select(bioname, cqlabel, icpsr, file) %>% 
@@ -122,7 +125,7 @@ TODO
 
 - [ ] measure gregariousness (frequency of speeches)
 
-- [ ] measure *level* of attention to district (mentions of home state, district, etc.)
+- [ ] measure *level* of attention to their district (mentions of their home state, district, etc.)
 
 - [ ] measure *ratio*/log odds of "my district" vs "my conscience" etc.
 
@@ -262,7 +265,8 @@ docs <- tibble(
   class = purrr::map_df(docs, class) %>%
     unlist(., use.names=FALSE),
   example = docs %>% slice(1) %>% 
-    unlist(., use.names=FALSE)
+    mutate_all(as.character()) %>%
+    as.matrix() %>% c()
        ) 
 
 docs %>% 
@@ -271,8 +275,14 @@ docs %>%
   scroll_box(height = "600px")
 ```
 
-# Save as .Rdata and .csv
+# Save 
+
+-member_district.Rdata
+-member_district.csv
 
 ```{r}
-#dc
+member_district <- d3
+save(member_district, file = here::here("data", "member_district_example.Rdata"))
+
+write_csv(member_district, path = here::here("data", "member_district_example.Rdata"))
 ```
