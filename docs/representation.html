@@ -2402,7 +2402,11 @@ file
 </div>
 <div id="merge-in-voteview-data" class="section level2">
 <h2>Merge in voteview data</h2>
-<p>by Congress and legislator ICPSR identifier linking to DW-NOMINATE spatial ideology scores based on voting record</p>
+<p>by Congress and legislator ICPSR identifier linking to variables including:</p>
+<ul>
+<li>DW-NOMINATE spatial ideology scores based on voting record (<code>nominate.dim1</code>, <code>nominate.dim2</code>)</li>
+<li><code>party_size</code></li>
+</ul>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>d &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">file =</span> cr_file <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_remove</span>(<span class="st">&quot;.*/&quot;</span>),</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>            <span class="dt">speech_id =</span> cr_file <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">str_extract</span>(<span class="st">&quot;000[0-9]*&quot;</span>),</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>            <span class="dt">icpsr =</span> <span class="kw">str_remove</span>(cr_file, <span class="st">&quot;.*-&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -2425,13 +2429,18 @@ file
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a></span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(members) </span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="co"># drop name varients</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;first&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;common&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;middle&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;last&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;maiden&quot;</span>), <span class="op">-</span>pattern)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="co"># count speeches per member</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(icpsr) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">add_count</span>(<span class="dt">name =</span> <span class="st">&quot;speeches_n&quot;</span>) </span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>d <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(bioname, cqlabel, icpsr, file) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="co"># drop name varients</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;first&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;common&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;middle&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;last&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;maiden&quot;</span>), <span class="op">-</span>pattern)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>speeches &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">distinct</span>(icpsr, file, speech_id, speeches_n, date, year, congress, chamber, bioname)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>d <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(bioname, cqlabel, icpsr, file) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -3862,7 +3871,7 @@ CREC-2020-03-04-pt1-PgS1449-4-000033-14226.txt
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">filter</span>(state <span class="op">==</span><span class="st"> &quot;wisconsin&quot;</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>             chamber <span class="op">==</span><span class="st"> &quot;House&quot;</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(icpsr) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">add_count</span>(<span class="dt">name =</span> <span class="st">&quot;speeches_n&quot;</span>) </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>d <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -3924,8 +3933,8 @@ measure <em>ratio</em>/log odds of “my district” vs “my conscience” etc.
 <div id="connectivity" class="section level2">
 <h2>Connectivity</h2>
 <ul>
-<li><a href="https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt">Facebook friendships</a></li>
-<li><a href="https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt">Travel</a></li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt">Facebook friendships</a> (<code>facebook_sci</code>)</li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt">Travel</a> (<code>flow_count</code>)</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># facebook friend data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>fb &lt;-<span class="st"> </span><span class="kw">read_csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_congress_facebook_sci_pop.txt&quot;</span>))  <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -103391,6 +103400,8 @@ CREC-2020-07-09-pt1-PgH3078-6-000108-20537.txt
 </div>
 <div id="docs" class="section level1">
 <h1>Docs</h1>
+<div id="improve-documentation-by-editing-this-google-sheet" class="section level2">
+<h2>Improve documentation by editing this <a href="https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA">google sheet</a></h2>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>docs &lt;-<span class="st"> </span>d2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">slice</span>(<span class="dv">2</span>) <span class="op">%&gt;%</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="st">  </span><span class="co">#FIXME when we figure out long/wide format </span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">left_join</span>(partisanship)</span>
@@ -103404,10 +103415,19 @@ CREC-2020-07-09-pt1-PgH3078-6-000108-20537.txt
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true"></a><span class="st">    </span><span class="kw">as.matrix</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">c</span>()</span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true"></a>       ) </span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true"></a></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a>docs <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">kable</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">kable_styling</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">height =</span> <span class="st">&quot;600px&quot;</span>)</span></code></pre></div>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true"></a><span class="co"># google doc</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true"></a><span class="kw">library</span>(googlesheets4)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true"></a>docs_gs &lt;-<span class="st"> </span><span class="kw">read_sheet</span>(<span class="st">&quot;https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA&quot;</span>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true"></a>docs <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(docs_gs)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true"></a><span class="kw">sheet_write</span>(docs,  <span class="st">&quot;https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA&quot;</span>, <span class="st">&quot;docs&quot;</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true"></a>docs <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true"></a><span class="st">  </span><span class="kw">kable</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true"></a><span class="st">  </span><span class="kw">kable_styling</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true"></a><span class="st">  </span><span class="kw">scroll_box</span>(<span class="dt">height =</span> <span class="st">&quot;600px&quot;</span>)</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:600px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -103420,6 +103440,18 @@ class
 </th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 example
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+type
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+source
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+description
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+SQL table
 </th>
 </tr>
 </thead>
@@ -103434,6 +103466,18 @@ character
 <td style="text-align:left;">
 CREC-2020-07-09-pt1-PgH3078-6-000108-20537.txt
 </td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+parsed congressional record speech file name in data/txt folder
+</td>
+<td style="text-align:left;">
+speeches
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103444,6 +103488,18 @@ character
 </td>
 <td style="text-align:left;">
 000108
+</td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+parser
+</td>
+<td style="text-align:left;">
+id assigned by parser. See <a href="https://judgelord.github.io/cr/speakers#Save_text_parsed_by_member_name" class="uri">https://judgelord.github.io/cr/speakers#Save_text_parsed_by_member_name</a>
+</td>
+<td style="text-align:left;">
+speeches
 </td>
 </tr>
 <tr>
@@ -103456,6 +103512,18 @@ integer
 <td style="text-align:left;">
 20537
 </td>
+<td style="text-align:left;">
+member-key
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+legislator id, unique to a member in a party (party-switchers get a new ICPSR id)
+</td>
+<td style="text-align:left;">
+speeches, members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103466,6 +103534,18 @@ Date
 </td>
 <td style="text-align:left;">
 2020-07-09
+</td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+YYYY-MM-DD
+</td>
+<td style="text-align:left;">
+speeches
 </td>
 </tr>
 <tr>
@@ -103478,6 +103558,18 @@ integer
 <td style="text-align:left;">
 2020
 </td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+YYYY
+</td>
+<td style="text-align:left;">
+speeches
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103488,6 +103580,18 @@ numeric
 </td>
 <td style="text-align:left;">
 116
+</td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+speeches, members
 </td>
 </tr>
 <tr>
@@ -103500,6 +103604,18 @@ character
 <td style="text-align:left;">
 House
 </td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+speeches, members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103510,6 +103626,18 @@ character
 </td>
 <td style="text-align:left;">
 MOORE, Gwendolynne S. (Gwen)
+</td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+voteview canonical name, unique to each legislator
+</td>
+<td style="text-align:left;">
+speeches, members
 </td>
 </tr>
 <tr>
@@ -103522,6 +103650,18 @@ character
 <td style="text-align:left;">
 MH11620537
 </td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103532,6 +103672,18 @@ integer
 </td>
 <td style="text-align:left;">
 100
+</td>
+<td style="text-align:left;">
+member-party
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+100 = Democrat, 200 = Republican
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103544,6 +103696,18 @@ character
 <td style="text-align:left;">
 (WI-04)
 </td>
+<td style="text-align:left;">
+district
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+(state_abbrev-district_code)
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103554,6 +103718,18 @@ character
 </td>
 <td style="text-align:left;">
 wisconsin
+</td>
+<td style="text-align:left;">
+district
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103566,6 +103742,18 @@ character
 <td style="text-align:left;">
 WI
 </td>
+<td style="text-align:left;">
+district
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103576,6 +103764,18 @@ character
 </td>
 <td style="text-align:left;">
 020537.jpg
+</td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103588,6 +103788,18 @@ character
 <td style="text-align:left;">
 gwendolynne-s-gwen-moore
 </td>
+<td style="text-align:left;">
+member
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103598,6 +103810,18 @@ numeric
 </td>
 <td style="text-align:left;">
 4
+</td>
+<td style="text-align:left;">
+district-key
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+Integer 0-99. Identifier for the district that the member represents within their state (e.g. 3 for the Alabama 3rd Congressional District). Senate members are given district_code 0. Members who represent historical “at-large” districts are assigned 99, 98, or 1 in various <a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103610,6 +103834,18 @@ character
 <td style="text-align:left;">
 Democratic Party
 </td>
+<td style="text-align:left;">
+member-party
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+Integer 1-9999. Identifying code for the member’s party. Please see documentation for Party Data for more information about which party_code identifiers refer to which parties.
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103620,6 +103856,18 @@ numeric
 </td>
 <td style="text-align:left;">
 -0.249
+</td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103632,6 +103880,18 @@ numeric
 <td style="text-align:left;">
 -0.528
 </td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103642,6 +103902,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.9612078
+</td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103654,6 +103926,18 @@ integer
 <td style="text-align:left;">
 236
 </td>
+<td style="text-align:left;">
+member-party
+</td>
+<td style="text-align:left;">
+voteview
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
+</td>
+<td style="text-align:left;">
+members
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103664,6 +103948,18 @@ integer
 </td>
 <td style="text-align:left;">
 1
+</td>
+<td style="text-align:left;">
+member-behavior
+</td>
+<td style="text-align:left;">
+congressional record
+</td>
+<td style="text-align:left;">
+total number of speeches per icpsr YYYY-YYYY
+</td>
+<td style="text-align:left;">
+members
 </td>
 </tr>
 <tr>
@@ -103676,6 +103972,18 @@ integer
 <td style="text-align:left;">
 4
 </td>
+<td style="text-align:left;">
+connectivity
+</td>
+<td style="text-align:left;">
+district code for node 1
+</td>
+<td style="text-align:left;">
+district_code
+</td>
+<td style="text-align:left;">
+connectivity
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103686,6 +103994,18 @@ integer
 </td>
 <td style="text-align:left;">
 1088428
+</td>
+<td style="text-align:left;">
+connectivity
+</td>
+<td style="text-align:left;">
+<a href="https://data.humdata.org" class="uri">https://data.humdata.org</a>
+</td>
+<td style="text-align:left;">
+within-district facebook connections. The SCI uses an anonymized snapshot of active Facebook users and their friendship networks to measure the intensity of social connectedness between locations. Users are assigned to locations based on their information and activity on Facebook, including the stated city on their Facebook profile, and device and connection information. Formally, the Social Connectedness Index between two locations i and j is defined as: SCIi,j = Connections(i,j) Usersi ∗ Usersj Where Usersi and Usersj are the number of Facebook users in locations i and j, and Connections(i,j) is the total number of Facebook friendship connections between individuals in the two locations.
+</td>
+<td style="text-align:left;">
+connectivity
 </td>
 </tr>
 <tr>
@@ -103698,6 +104018,18 @@ integer
 <td style="text-align:left;">
 523024
 </td>
+<td style="text-align:left;">
+connectivity
+</td>
+<td style="text-align:left;">
+<a href="https://www.safegraph.com/" class="uri">https://www.safegraph.com/</a>
+</td>
+<td style="text-align:left;">
+within-district travel
+</td>
+<td style="text-align:left;">
+connectivity
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103708,6 +104040,18 @@ character
 </td>
 <td style="text-align:left;">
 5001500US5504
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103720,6 +104064,18 @@ character
 <td style="text-align:left;">
 Congressional District 4 (115th Congress), Wisconsin
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103730,6 +104086,18 @@ character
 </td>
 <td style="text-align:left;">
 SF1DP1002
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103742,6 +104110,18 @@ numeric
 <td style="text-align:left;">
 100
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103752,6 +104132,18 @@ character
 </td>
 <td style="text-align:left;">
 Percent
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+“Number” or “Percent” (row 2 of the CD_DEMO_DATA&quot;)
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103764,6 +104156,18 @@ character
 <td style="text-align:left;">
 SEX AND AGE
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+Census variable catagory (row 3 of CD_DEMO_DATA)
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103775,6 +104179,18 @@ character
 <td style="text-align:left;">
 Total population
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+Row 4 of CD_DEMO_DATA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103782,6 +104198,18 @@ group
 </td>
 <td style="text-align:left;">
 character
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Row 5 of CD_DEMO_DATA
 </td>
 <td style="text-align:left;">
 NA
@@ -103797,6 +104225,18 @@ character
 <td style="text-align:left;">
 55079054500001
 </td>
+<td style="text-align:left;">
+district-key
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103807,6 +104247,18 @@ numeric
 </td>
 <td style="text-align:left;">
 55079
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103819,6 +104271,18 @@ character
 <td style="text-align:left;">
 Milwaukee
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103829,6 +104293,18 @@ numeric
 </td>
 <td style="text-align:left;">
 5450
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103841,6 +104317,18 @@ numeric
 <td style="text-align:left;">
 5507905450
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103851,6 +104339,18 @@ character
 </td>
 <td style="text-align:left;">
 Bayside
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103863,6 +104363,18 @@ character
 <td style="text-align:left;">
 V
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103873,6 +104385,18 @@ character
 </td>
 <td style="text-align:left;">
 Bayside - V 0001
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103885,6 +104409,18 @@ numeric
 <td style="text-align:left;">
 47
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103895,6 +104431,18 @@ numeric
 </td>
 <td style="text-align:left;">
 23
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103907,6 +104455,18 @@ numeric
 <td style="text-align:left;">
 23
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103917,6 +104477,18 @@ numeric
 </td>
 <td style="text-align:left;">
 8
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103929,6 +104501,18 @@ numeric
 <td style="text-align:left;">
 4
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103939,6 +104523,18 @@ character
 </td>
 <td style="text-align:left;">
 0001
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103951,6 +104547,18 @@ numeric
 <td style="text-align:left;">
 938
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103961,6 +104569,18 @@ numeric
 </td>
 <td style="text-align:left;">
 785
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103973,6 +104593,18 @@ numeric
 <td style="text-align:left;">
 775
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -103983,6 +104615,18 @@ numeric
 </td>
 <td style="text-align:left;">
 61
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -103995,6 +104639,18 @@ numeric
 <td style="text-align:left;">
 24
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104005,6 +104661,18 @@ numeric
 </td>
 <td style="text-align:left;">
 67
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104017,6 +104685,18 @@ numeric
 <td style="text-align:left;">
 3
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104027,6 +104707,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104039,6 +104731,18 @@ numeric
 <td style="text-align:left;">
 5
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104049,6 +104753,18 @@ numeric
 </td>
 <td style="text-align:left;">
 3
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104061,6 +104777,18 @@ numeric
 <td style="text-align:left;">
 664
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104071,6 +104799,18 @@ numeric
 </td>
 <td style="text-align:left;">
 45
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104083,6 +104823,18 @@ numeric
 <td style="text-align:left;">
 19
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104093,6 +104845,18 @@ numeric
 </td>
 <td style="text-align:left;">
 50
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104105,6 +104869,18 @@ numeric
 <td style="text-align:left;">
 2
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104115,6 +104891,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104127,6 +104915,18 @@ numeric
 <td style="text-align:left;">
 2
 </td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104137,6 +104937,18 @@ numeric
 </td>
 <td style="text-align:left;">
 3
+</td>
+<td style="text-align:left;">
+district-demographics
+</td>
+<td style="text-align:left;">
+US Census
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+demographics
 </td>
 </tr>
 <tr>
@@ -104149,6 +104961,18 @@ numeric
 <td style="text-align:left;">
 9044
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104159,6 +104983,18 @@ numeric
 </td>
 <td style="text-align:left;">
 3357
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104171,6 +105007,18 @@ numeric
 <td style="text-align:left;">
 5576
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104181,6 +105029,18 @@ numeric
 </td>
 <td style="text-align:left;">
 7500
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104193,6 +105053,18 @@ numeric
 <td style="text-align:left;">
 2900
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104203,6 +105075,18 @@ numeric
 </td>
 <td style="text-align:left;">
 4454
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104215,6 +105099,18 @@ numeric
 <td style="text-align:left;">
 0.3711853
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104225,6 +105121,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6165414
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104237,6 +105145,18 @@ numeric
 <td style="text-align:left;">
 0.3866667
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104247,6 +105167,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5938667
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104259,6 +105191,18 @@ numeric
 <td style="text-align:left;">
 0.01599406
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104269,6 +105213,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.05138836
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104281,6 +105237,18 @@ numeric
 <td style="text-align:left;">
 -0.07963436
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104291,6 +105259,18 @@ numeric
 </td>
 <td style="text-align:left;">
 -0.04898275
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104303,6 +105283,18 @@ numeric
 <td style="text-align:left;">
 0.04706009
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104313,6 +105305,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.3711853
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104325,6 +105329,18 @@ numeric
 <td style="text-align:left;">
 -0.06974295
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104335,6 +105351,18 @@ numeric
 </td>
 <td style="text-align:left;">
 -0.0740837
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104347,6 +105375,18 @@ numeric
 <td style="text-align:left;">
 0.006716452
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104357,6 +105397,18 @@ numeric
 </td>
 <td style="text-align:left;">
 -0.584955
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104369,6 +105421,18 @@ numeric
 <td style="text-align:left;">
 -0.110768
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104379,6 +105443,18 @@ numeric
 </td>
 <td style="text-align:left;">
 -0.1111895
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104391,6 +105467,18 @@ numeric
 <td style="text-align:left;">
 0.3551913
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104401,6 +105489,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6284153
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104413,6 +105513,18 @@ numeric
 <td style="text-align:left;">
 0.319797
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104423,6 +105535,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6175973
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104435,6 +105559,18 @@ numeric
 <td style="text-align:left;">
 0.4508197
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104445,6 +105581,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5409836
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104457,6 +105605,18 @@ numeric
 <td style="text-align:left;">
 0.4201681
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104467,6 +105627,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5663866
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104479,6 +105651,18 @@ numeric
 <td style="text-align:left;">
 0.4046346
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104489,6 +105673,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5918004
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104501,6 +105697,18 @@ numeric
 <td style="text-align:left;">
 0.366306
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104511,6 +105719,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6228748
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104523,6 +105743,18 @@ numeric
 <td style="text-align:left;">
 0.3412229
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104533,6 +105765,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6508876
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104545,6 +105789,18 @@ numeric
 <td style="text-align:left;">
 0.4119318
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104555,6 +105811,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5795455
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104567,6 +105835,18 @@ numeric
 <td style="text-align:left;">
 0.375
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104577,6 +105857,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5791667
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104589,6 +105881,18 @@ numeric
 <td style="text-align:left;">
 0.3241252
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104599,6 +105903,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6556169
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104611,6 +105927,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104621,6 +105949,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6613546
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104633,6 +105973,18 @@ numeric
 <td style="text-align:left;">
 0.4409283
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104643,6 +105995,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.535865
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104655,6 +106019,18 @@ numeric
 <td style="text-align:left;">
 0.445269
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104665,6 +106041,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5269017
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104677,6 +106065,18 @@ numeric
 <td style="text-align:left;">
 0.4670433
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104687,6 +106087,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5028249
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104699,6 +106111,18 @@ numeric
 <td style="text-align:left;">
 0.6598639
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104709,6 +106133,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104721,6 +106157,18 @@ numeric
 <td style="text-align:left;">
 0.3798768
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104731,6 +106179,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6119097
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104743,6 +106203,18 @@ numeric
 <td style="text-align:left;">
 0.4641288
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104753,6 +106225,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5241581
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104765,6 +106249,18 @@ numeric
 <td style="text-align:left;">
 0.7802198
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104775,6 +106271,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104787,6 +106295,18 @@ numeric
 <td style="text-align:left;">
 0.3169399
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104797,6 +106317,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6812386
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104809,6 +106341,18 @@ numeric
 <td style="text-align:left;">
 0.3924915
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104819,6 +106363,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5955631
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104831,6 +106387,18 @@ numeric
 <td style="text-align:left;">
 0.4421769
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104841,6 +106409,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5459184
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104853,6 +106433,18 @@ numeric
 <td style="text-align:left;">
 0.3838028
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104863,6 +106455,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6161972
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104875,6 +106479,18 @@ numeric
 <td style="text-align:left;">
 0.212
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104885,6 +106501,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.772
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104897,6 +106525,18 @@ numeric
 <td style="text-align:left;">
 0.3171429
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104907,6 +106547,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6814286
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104919,6 +106571,18 @@ numeric
 <td style="text-align:left;">
 0.3644689
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104929,6 +106593,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6336996
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104941,6 +106617,18 @@ numeric
 <td style="text-align:left;">
 0.9561404
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104951,6 +106639,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104963,6 +106663,18 @@ numeric
 <td style="text-align:left;">
 0.4819533
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104973,6 +106685,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5159236
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -104985,6 +106709,18 @@ numeric
 <td style="text-align:left;">
 0.4823748
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -104995,6 +106731,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5157699
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105007,6 +106755,18 @@ numeric
 <td style="text-align:left;">
 0.9868852
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105017,6 +106777,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105029,6 +106801,18 @@ numeric
 <td style="text-align:left;">
 0.500821
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105039,6 +106823,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.4975369
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105051,6 +106847,18 @@ numeric
 <td style="text-align:left;">
 0.378
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105061,6 +106869,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.622
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105073,6 +106893,18 @@ numeric
 <td style="text-align:left;">
 0.9595687
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105083,6 +106915,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105095,6 +106939,18 @@ numeric
 <td style="text-align:left;">
 0.458613
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105105,6 +106961,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.541387
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105117,6 +106985,18 @@ numeric
 <td style="text-align:left;">
 0.3449541
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105127,6 +107007,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6385321
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105139,6 +107031,18 @@ numeric
 <td style="text-align:left;">
 0.434238
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105149,6 +107053,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5427975
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105161,6 +107077,18 @@ numeric
 <td style="text-align:left;">
 0.4757463
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105171,6 +107099,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5242537
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105183,6 +107123,18 @@ numeric
 <td style="text-align:left;">
 0.392
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105193,6 +107145,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.606
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105205,6 +107169,18 @@ numeric
 <td style="text-align:left;">
 0.4313305
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105215,6 +107191,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.5686695
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105227,6 +107215,18 @@ numeric
 <td style="text-align:left;">
 0.9404762
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105237,6 +107237,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105249,6 +107261,18 @@ numeric
 <td style="text-align:left;">
 0.888563
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105259,6 +107283,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.01759531
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105271,6 +107307,18 @@ numeric
 <td style="text-align:left;">
 0.3637795
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105281,6 +107329,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.6346457
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105293,6 +107353,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105303,6 +107375,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105315,6 +107399,18 @@ numeric
 <td style="text-align:left;">
 0.489019
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105325,6 +107421,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0.510981
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105337,6 +107445,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105347,6 +107467,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105359,6 +107491,18 @@ numeric
 <td style="text-align:left;">
 549
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105369,6 +107513,18 @@ numeric
 </td>
 <td style="text-align:left;">
 195
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105381,6 +107537,18 @@ numeric
 <td style="text-align:left;">
 345
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105391,6 +107559,18 @@ numeric
 </td>
 <td style="text-align:left;">
 544
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105403,6 +107583,18 @@ numeric
 <td style="text-align:left;">
 179
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105413,6 +107605,18 @@ numeric
 </td>
 <td style="text-align:left;">
 363
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105425,6 +107629,18 @@ numeric
 <td style="text-align:left;">
 534
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105435,6 +107651,18 @@ numeric
 </td>
 <td style="text-align:left;">
 174
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105447,6 +107675,18 @@ numeric
 <td style="text-align:left;">
 352
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105457,6 +107697,18 @@ numeric
 </td>
 <td style="text-align:left;">
 543
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105469,6 +107721,18 @@ numeric
 <td style="text-align:left;">
 176
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105479,6 +107743,18 @@ numeric
 </td>
 <td style="text-align:left;">
 356
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105491,6 +107767,18 @@ numeric
 <td style="text-align:left;">
 549
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105501,6 +107789,18 @@ numeric
 </td>
 <td style="text-align:left;">
 174
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105513,6 +107813,18 @@ numeric
 <td style="text-align:left;">
 374
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105523,6 +107835,18 @@ numeric
 </td>
 <td style="text-align:left;">
 545
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105535,6 +107859,18 @@ numeric
 <td style="text-align:left;">
 188
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105545,6 +107881,18 @@ numeric
 </td>
 <td style="text-align:left;">
 348
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105557,6 +107905,18 @@ numeric
 <td style="text-align:left;">
 546
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105567,6 +107927,18 @@ numeric
 </td>
 <td style="text-align:left;">
 199
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105579,6 +107951,18 @@ numeric
 <td style="text-align:left;">
 346
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105589,6 +107973,18 @@ numeric
 </td>
 <td style="text-align:left;">
 591
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105601,6 +107997,18 @@ numeric
 <td style="text-align:left;">
 365
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105611,6 +108019,18 @@ numeric
 </td>
 <td style="text-align:left;">
 189
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105623,6 +108043,18 @@ numeric
 <td style="text-align:left;">
 502
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105633,6 +108065,18 @@ numeric
 </td>
 <td style="text-align:left;">
 332
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105645,6 +108089,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105655,6 +108111,18 @@ numeric
 </td>
 <td style="text-align:left;">
 586
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105667,6 +108135,18 @@ numeric
 <td style="text-align:left;">
 349
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105677,6 +108157,18 @@ numeric
 </td>
 <td style="text-align:left;">
 230
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105689,6 +108181,18 @@ numeric
 <td style="text-align:left;">
 342
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105699,6 +108203,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105711,6 +108227,18 @@ numeric
 <td style="text-align:left;">
 327
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105721,6 +108249,18 @@ numeric
 </td>
 <td style="text-align:left;">
 336
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105733,6 +108273,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105743,6 +108295,18 @@ numeric
 </td>
 <td style="text-align:left;">
 316
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105755,6 +108319,18 @@ numeric
 <td style="text-align:left;">
 488
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105765,6 +108341,18 @@ numeric
 </td>
 <td style="text-align:left;">
 264
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105777,6 +108365,18 @@ numeric
 <td style="text-align:left;">
 220
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105787,6 +108387,18 @@ numeric
 </td>
 <td style="text-align:left;">
 475
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105799,6 +108411,18 @@ numeric
 <td style="text-align:left;">
 266
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105809,6 +108433,18 @@ numeric
 </td>
 <td style="text-align:left;">
 190
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105821,6 +108457,18 @@ numeric
 <td style="text-align:left;">
 465
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105831,6 +108479,18 @@ numeric
 </td>
 <td style="text-align:left;">
 244
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105843,6 +108503,18 @@ numeric
 <td style="text-align:left;">
 199
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105853,6 +108525,18 @@ numeric
 </td>
 <td style="text-align:left;">
 474
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105865,6 +108549,18 @@ numeric
 <td style="text-align:left;">
 254
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105875,6 +108571,18 @@ numeric
 </td>
 <td style="text-align:left;">
 209
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105887,6 +108595,18 @@ numeric
 <td style="text-align:left;">
 479
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105897,6 +108617,18 @@ numeric
 </td>
 <td style="text-align:left;">
 260
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105909,6 +108641,18 @@ numeric
 <td style="text-align:left;">
 208
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105919,6 +108663,18 @@ numeric
 </td>
 <td style="text-align:left;">
 471
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105931,6 +108687,18 @@ numeric
 <td style="text-align:left;">
 243
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105941,6 +108709,18 @@ numeric
 </td>
 <td style="text-align:left;">
 227
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105953,6 +108733,18 @@ numeric
 <td style="text-align:left;">
 512
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105963,6 +108755,18 @@ numeric
 </td>
 <td style="text-align:left;">
 266
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105975,6 +108779,18 @@ numeric
 <td style="text-align:left;">
 244
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -105985,6 +108801,18 @@ numeric
 </td>
 <td style="text-align:left;">
 595
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -105997,6 +108825,18 @@ numeric
 <td style="text-align:left;">
 337
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106007,6 +108847,18 @@ numeric
 </td>
 <td style="text-align:left;">
 250
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106019,6 +108871,18 @@ numeric
 <td style="text-align:left;">
 539
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106029,6 +108893,18 @@ numeric
 </td>
 <td style="text-align:left;">
 284
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106041,6 +108917,18 @@ numeric
 <td style="text-align:left;">
 240
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106051,6 +108939,18 @@ numeric
 </td>
 <td style="text-align:left;">
 588
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106063,6 +108963,18 @@ numeric
 <td style="text-align:left;">
 321
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106073,6 +108985,18 @@ numeric
 </td>
 <td style="text-align:left;">
 260
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106085,6 +109009,18 @@ numeric
 <td style="text-align:left;">
 539
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106095,6 +109031,18 @@ numeric
 </td>
 <td style="text-align:left;">
 278
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106107,6 +109055,18 @@ numeric
 <td style="text-align:left;">
 260
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106117,6 +109077,18 @@ numeric
 </td>
 <td style="text-align:left;">
 341
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106129,6 +109101,18 @@ numeric
 <td style="text-align:left;">
 6
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106139,6 +109123,18 @@ numeric
 </td>
 <td style="text-align:left;">
 303
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106151,6 +109147,18 @@ numeric
 <td style="text-align:left;">
 561
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106161,6 +109169,18 @@ numeric
 </td>
 <td style="text-align:left;">
 332
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106173,6 +109193,18 @@ numeric
 <td style="text-align:left;">
 227
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106183,6 +109215,18 @@ numeric
 </td>
 <td style="text-align:left;">
 515
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106195,6 +109239,18 @@ numeric
 <td style="text-align:left;">
 334
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106205,6 +109261,18 @@ numeric
 </td>
 <td style="text-align:left;">
 180
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106217,6 +109285,18 @@ numeric
 <td style="text-align:left;">
 502
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106227,6 +109307,18 @@ numeric
 </td>
 <td style="text-align:left;">
 290
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106239,6 +109331,18 @@ numeric
 <td style="text-align:left;">
 210
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106249,6 +109353,18 @@ numeric
 </td>
 <td style="text-align:left;">
 531
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106261,6 +109377,18 @@ numeric
 <td style="text-align:left;">
 267
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106271,6 +109399,18 @@ numeric
 </td>
 <td style="text-align:left;">
 248
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106283,6 +109423,18 @@ numeric
 <td style="text-align:left;">
 568
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106293,6 +109445,18 @@ numeric
 </td>
 <td style="text-align:left;">
 350
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106305,6 +109469,18 @@ numeric
 <td style="text-align:left;">
 218
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106315,6 +109491,18 @@ numeric
 </td>
 <td style="text-align:left;">
 536
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106327,6 +109515,18 @@ numeric
 <td style="text-align:left;">
 281
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106337,6 +109537,18 @@ numeric
 </td>
 <td style="text-align:left;">
 255
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106349,6 +109561,18 @@ numeric
 <td style="text-align:left;">
 305
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106359,6 +109583,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106371,6 +109607,18 @@ numeric
 <td style="text-align:left;">
 301
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106381,6 +109629,18 @@ numeric
 </td>
 <td style="text-align:left;">
 647
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106393,6 +109653,18 @@ numeric
 <td style="text-align:left;">
 403
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106403,6 +109675,18 @@ numeric
 </td>
 <td style="text-align:left;">
 237
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106415,6 +109699,18 @@ numeric
 <td style="text-align:left;">
 441
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106425,6 +109721,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106437,6 +109745,18 @@ numeric
 <td style="text-align:left;">
 291
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106447,6 +109767,18 @@ numeric
 </td>
 <td style="text-align:left;">
 609
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106459,6 +109791,18 @@ numeric
 <td style="text-align:left;">
 303
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106469,6 +109813,18 @@ numeric
 </td>
 <td style="text-align:left;">
 305
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106481,6 +109837,18 @@ numeric
 <td style="text-align:left;">
 635
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106491,6 +109859,18 @@ numeric
 </td>
 <td style="text-align:left;">
 403
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106503,6 +109883,18 @@ numeric
 <td style="text-align:left;">
 231
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106513,6 +109905,18 @@ numeric
 </td>
 <td style="text-align:left;">
 507
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106525,6 +109929,18 @@ numeric
 <td style="text-align:left;">
 330
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106535,6 +109951,18 @@ numeric
 </td>
 <td style="text-align:left;">
 173
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106547,6 +109975,18 @@ numeric
 <td style="text-align:left;">
 484
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106557,6 +109997,18 @@ numeric
 </td>
 <td style="text-align:left;">
 332
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106569,6 +110021,18 @@ numeric
 <td style="text-align:left;">
 136
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106579,6 +110043,18 @@ numeric
 </td>
 <td style="text-align:left;">
 478
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106591,6 +110067,18 @@ numeric
 <td style="text-align:left;">
 285
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106601,6 +110089,18 @@ numeric
 </td>
 <td style="text-align:left;">
 177
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106613,6 +110113,18 @@ numeric
 <td style="text-align:left;">
 487
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106623,6 +110135,18 @@ numeric
 </td>
 <td style="text-align:left;">
 298
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106635,6 +110159,18 @@ numeric
 <td style="text-align:left;">
 185
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106645,6 +110181,18 @@ numeric
 </td>
 <td style="text-align:left;">
 500
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106657,6 +110205,18 @@ numeric
 <td style="text-align:left;">
 386
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106667,6 +110227,18 @@ numeric
 </td>
 <td style="text-align:left;">
 106
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106679,6 +110251,18 @@ numeric
 <td style="text-align:left;">
 500
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106689,6 +110273,18 @@ numeric
 </td>
 <td style="text-align:left;">
 303
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106701,6 +110297,18 @@ numeric
 <td style="text-align:left;">
 196
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106711,6 +110319,18 @@ numeric
 </td>
 <td style="text-align:left;">
 500
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106723,6 +110343,18 @@ numeric
 <td style="text-align:left;">
 311
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106733,6 +110365,18 @@ numeric
 </td>
 <td style="text-align:left;">
 189
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106745,6 +110389,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106755,6 +110411,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106767,6 +110435,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106777,6 +110457,18 @@ numeric
 </td>
 <td style="text-align:left;">
 704
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106789,6 +110481,18 @@ numeric
 <td style="text-align:left;">
 408
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106799,6 +110503,18 @@ numeric
 </td>
 <td style="text-align:left;">
 290
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106811,6 +110527,18 @@ numeric
 <td style="text-align:left;">
 683
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106821,6 +110549,18 @@ numeric
 </td>
 <td style="text-align:left;">
 358
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106833,6 +110573,18 @@ numeric
 <td style="text-align:left;">
 317
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106843,6 +110595,18 @@ numeric
 </td>
 <td style="text-align:left;">
 700
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106855,6 +110619,18 @@ numeric
 <td style="text-align:left;">
 477
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106865,6 +110641,18 @@ numeric
 </td>
 <td style="text-align:left;">
 222
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106877,6 +110665,18 @@ numeric
 <td style="text-align:left;">
 371
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106887,6 +110687,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106899,6 +110711,18 @@ numeric
 <td style="text-align:left;">
 356
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106909,6 +110733,18 @@ numeric
 </td>
 <td style="text-align:left;">
 683
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106921,6 +110757,18 @@ numeric
 <td style="text-align:left;">
 349
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106931,6 +110779,18 @@ numeric
 </td>
 <td style="text-align:left;">
 334
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106943,6 +110803,18 @@ numeric
 <td style="text-align:left;">
 480
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106953,6 +110825,18 @@ numeric
 </td>
 <td style="text-align:left;">
 278
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106965,6 +110849,18 @@ numeric
 <td style="text-align:left;">
 180
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106975,6 +110871,18 @@ numeric
 </td>
 <td style="text-align:left;">
 451
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -106987,6 +110895,18 @@ numeric
 <td style="text-align:left;">
 298
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -106997,6 +110917,18 @@ numeric
 </td>
 <td style="text-align:left;">
 150
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107009,6 +110941,18 @@ numeric
 <td style="text-align:left;">
 445
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107019,6 +110963,18 @@ numeric
 </td>
 <td style="text-align:left;">
 224
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107031,6 +110987,18 @@ numeric
 <td style="text-align:left;">
 199
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107041,6 +111009,18 @@ numeric
 </td>
 <td style="text-align:left;">
 364
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107053,6 +111033,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107063,6 +111055,18 @@ numeric
 </td>
 <td style="text-align:left;">
 284
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107075,6 +111079,18 @@ numeric
 <td style="text-align:left;">
 466
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107085,6 +111101,18 @@ numeric
 </td>
 <td style="text-align:left;">
 265
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107097,6 +111125,18 @@ numeric
 <td style="text-align:left;">
 201
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107107,6 +111147,18 @@ numeric
 </td>
 <td style="text-align:left;">
 447
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107119,6 +111171,18 @@ numeric
 <td style="text-align:left;">
 242
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107129,6 +111193,18 @@ numeric
 </td>
 <td style="text-align:left;">
 205
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107141,6 +111217,18 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -107151,6 +111239,18 @@ numeric
 </td>
 <td style="text-align:left;">
 0
+</td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
 </td>
 </tr>
 <tr>
@@ -107163,22 +111263,61 @@ numeric
 <td style="text-align:left;">
 0
 </td>
+<td style="text-align:left;">
+district-partisanship
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+partisanship
+</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="save" class="section level1">
-<h1>Save</h1>
+</div>
+<div id="toy-data" class="section level1">
+<h1>Toy Data</h1>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>member_district &lt;-<span class="st"> </span>d4</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">save</span>(member_district, <span class="dt">file =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.Rdata&quot;</span>))</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="kw">write_csv</span>(member_district, <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.csv&quot;</span>))</span></code></pre></div>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="co"># RDATA </span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="kw">save</span>(member_district, <span class="dt">file =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.Rdata&quot;</span>))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a><span class="co"># CSV</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="kw">write_csv</span>(member_district, <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.csv&quot;</span>))</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a><span class="co"># RSQLite database</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a><span class="kw">library</span>(DBI)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a><span class="kw">library</span>(RSQLite)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a>con &lt;-<span class="st"> </span><span class="kw">dbConnect</span>(RSQLite<span class="op">::</span><span class="kw">SQLite</span>(), here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.sqlite&quot;</span>))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true"></a><span class="kw">dbWriteTable</span>(con, <span class="st">&quot;members&quot;</span>, members, <span class="dt">overwrite =</span> T)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true"></a><span class="kw">dbWriteTable</span>(con, <span class="st">&quot;speeches&quot;</span>, speeches, <span class="dt">overwrite =</span> T)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true"></a><span class="kw">dbWriteTable</span>(con, <span class="st">&quot;connectivity&quot;</span>, c, <span class="dt">overwrite =</span> T)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true"></a><span class="kw">dbWriteTable</span>(con, <span class="st">&quot;demographics&quot;</span>, dem, <span class="dt">overwrite =</span> T)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true"></a><span class="kw">dbWriteTable</span>(con, <span class="st">&quot;partisanship&quot;</span>, partisanship, <span class="dt">overwrite =</span> T)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true"></a><span class="co"># Example SQL fetch results:</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true"></a>speeches2020 &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(con, <span class="st">&quot;SELECT * FROM speeches WHERE year = &#39;2020&#39;&quot;</span>) </span></code></pre></div>
 <ul>
-<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata">member_district.Rdata</a></li>
-<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv">member_district.csv</a></li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata">member_district_example.Rdata</a></li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv">member_district_example.csv</a></li>
+<li>member_district_example.sqlite (in dropbox; too large for github). SQL tables:</li>
 </ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="kw">dbListTables</span>(con)</span></code></pre></div>
+<pre><code>## [1] &quot;connectivity&quot; &quot;demographics&quot; &quot;members&quot;      &quot;partisanship&quot; &quot;speeches&quot;</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="kw">dbDisconnect</span>(con)</span></code></pre></div>
 </div>
 
 

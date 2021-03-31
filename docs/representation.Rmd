@@ -67,7 +67,10 @@ tibble(file = cr_file) %>% kablebox()
 
 ## Merge in voteview data
 
-by Congress and legislator ICPSR identifier linking to DW-NOMINATE spatial ideology scores based on voting record 
+by Congress and legislator ICPSR identifier linking to variables including:
+
+- DW-NOMINATE spatial ideology scores based on voting record (`nominate.dim1`, `nominate.dim2`)
+- `party_size`
 
 ```{r}
 d <- tibble(file = cr_file %>% str_remove(".*/"),
@@ -92,8 +95,13 @@ load(here("data", "members.Rdata"))
 
 d %<>% left_join(members) 
 
+# count speeches per member
+d %<>% group_by(icpsr) %>% add_count(name = "speeches_n") 
+
 # drop name varients
 d %<>% select(-contains("first"), -contains("common"), -contains("middle"), -contains("last"), -contains("maiden"), -pattern)
+
+speeches <- d %>% distinct(icpsr, file, speech_id, speeches_n, date, year, congress, chamber, bioname)
 
 d %>% 
   select(bioname, cqlabel, icpsr, file) %>% 
@@ -109,7 +117,7 @@ d %>%
 d %<>% filter(state == "wisconsin",
              chamber == "House")
 
-d %<>% group_by(icpsr) %>% add_count(name = "speeches_n") 
+
 
 
 d %>% 
@@ -135,8 +143,8 @@ TODO
 
 ## Connectivity
 
-- [Facebook friendships](https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt)
-- [Travel](https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt)
+- [Facebook friendships](https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt) (`facebook_sci`)
+- [Travel](https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt) (`flow_count`)
 
 
 ```{r}
@@ -267,6 +275,8 @@ d4 %>%
 
 # Docs 
 
+## Improve documentation by editing this [google sheet](https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA)
+
 ```{r}
 docs <- d2 %>% slice(2) %>%
   #FIXME when we figure out long/wide format 
@@ -281,23 +291,58 @@ docs <- tibble(
     as.matrix() %>% c()
        ) 
 
+# google doc
+library(googlesheets4)
+docs_gs <- read_sheet("https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA")
+
+docs %<>% left_join(docs_gs)
+
+sheet_write(docs,  "https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA", "docs")
+
+
 docs %>% 
   kable() %>% 
   kable_styling() %>% 
   scroll_box(height = "600px")
 ```
 
-# Save 
-
-
+# Toy Data
 
 ```{r}
 member_district <- d4
 
+# RDATA 
 save(member_district, file = here::here("data", "member_district_example.Rdata"))
 
+# CSV
 write_csv(member_district, path = here::here("data", "member_district_example.csv"))
+
+
+
+# RSQLite database
+library(DBI)
+library(RSQLite)
+con <- dbConnect(RSQLite::SQLite(), here::here("data", "member_district_example.sqlite"))
+
+dbWriteTable(con, "members", members, overwrite = T)
+
+dbWriteTable(con, "speeches", speeches, overwrite = T)
+
+dbWriteTable(con, "connectivity", c, overwrite = T)
+
+dbWriteTable(con, "demographics", dem, overwrite = T)
+
+dbWriteTable(con, "partisanship", partisanship, overwrite = T)
+
+# Example SQL fetch results:
+speeches2020 <- dbGetQuery(con, "SELECT * FROM speeches WHERE year = '2020'") 
 ```
 
-- [member_district.Rdata](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata)
-- [member_district.csv](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv)
+- [member_district_example.Rdata](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata)
+- [member_district_example.csv](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv)
+- member_district_example.sqlite (in dropbox; too large for github). SQL tables:
+
+```{r}
+dbListTables(con)
+dbDisconnect(con)
+```
