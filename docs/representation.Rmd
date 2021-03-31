@@ -93,7 +93,7 @@ load(here("data", "members.Rdata"))
 d %<>% left_join(members) 
 
 # drop name varients
-d %<>% select(-contains("first"), -contains("common"), -contains("middle"), -contains("last"), -contains("maiden"))
+d %<>% select(-contains("first"), -contains("common"), -contains("middle"), -contains("last"), -contains("maiden"), -pattern)
 
 d %>% 
   select(bioname, cqlabel, icpsr, file) %>% 
@@ -134,6 +134,10 @@ TODO
 # District characteristics 
 
 ## Connectivity
+
+- [Facebook friendships](https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt)
+- [Travel](https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt)
+
 
 ```{r}
 # facebook friend data
@@ -226,29 +230,37 @@ partisanship <- read_csv(here::here("data", "WI_FULL_WARD_ELECTORAL_DATA_02_TO_1
   select(-NAME)
 
 partisanship %>% kablebox()
+```
 
-# aggregate to district 
+
+### Aggregate to district 
+
+```{r}
 partisanship_agg <- partisanship %>% 
   group_by(district_code) %>% 
   # for example, sum cumulative patisanship vars
-  summarise(across(contains("_CUM_") | BLACK|WHITE|HISPANIC| ASIAN|AMINDIAN, sum))
+  summarise(across(contains("_CUM_") | PERSONS|BLACK|WHITE|HISPANIC| ASIAN|AMINDIAN, sum))
+
+partisanship_agg %>% kablebox()
 ```
  
 ### Merge in aggregate partisanship
 ```{r}
 d3 <- d2 %>% left_join(partisanship_agg)
 
-d3 %>%
+d4 <- d3 %>%
   select(bioname, district_code, icpsr,
          # speech
          speeches_n, file,
          # community
          facebook_sci, flow_count,
          # race 
-          BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,
+         PERSONS, BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,
          # partisanship
          starts_with("REP"), starts_with("DEM"), starts_with("OTH")) %>%
-  distinct() %>% 
+  distinct() 
+
+d4 %>% 
   kablebox()
 ```
 
@@ -277,12 +289,15 @@ docs %>%
 
 # Save 
 
--member_district.Rdata
--member_district.csv
+
 
 ```{r}
-member_district <- d3
+member_district <- d4
+
 save(member_district, file = here::here("data", "member_district_example.Rdata"))
 
-write_csv(member_district, path = here::here("data", "member_district_example.Rdata"))
+write_csv(member_district, path = here::here("data", "member_district_example.csv"))
 ```
+
+- [member_district.Rdata](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata)
+- [member_district.csv](https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv)

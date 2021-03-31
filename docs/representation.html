@@ -2426,7 +2426,7 @@ file
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(members) </span>
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="co"># drop name varients</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;first&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;common&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;middle&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;last&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;maiden&quot;</span>))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>d <span class="op">%&lt;&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;first&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;common&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;middle&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;last&quot;</span>), <span class="op">-</span><span class="kw">contains</span>(<span class="st">&quot;maiden&quot;</span>), <span class="op">-</span>pattern)</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>d <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(bioname, cqlabel, icpsr, file) <span class="op">%&gt;%</span><span class="st"> </span></span>
@@ -3923,6 +3923,10 @@ measure <em>ratio</em>/log odds of “my district” vs “my conscience” etc.
 <h1>District characteristics</h1>
 <div id="connectivity" class="section level2">
 <h2>Connectivity</h2>
+<ul>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt">Facebook friendships</a></li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt">Travel</a></li>
+</ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># facebook friend data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>fb &lt;-<span class="st"> </span><span class="kw">read_csv</span>(here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_congress_facebook_sci_pop.txt&quot;</span>))  <span class="op">%&gt;%</span><span class="st"> </span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate_all</span>(as.integer)</span>
@@ -102864,27 +102868,410 @@ Chetek - T 0001
 </tbody>
 </table>
 </div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co"># aggregate to district </span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>partisanship_agg &lt;-<span class="st"> </span>partisanship <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(district_code) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="st">  </span><span class="co"># for example, sum cumulative patisanship vars</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="kw">across</span>(<span class="kw">contains</span>(<span class="st">&quot;_CUM_&quot;</span>) <span class="op">|</span><span class="st"> </span>BLACK<span class="op">|</span>WHITE<span class="op">|</span>HISPANIC<span class="op">|</span><span class="st"> </span>ASIAN<span class="op">|</span>AMINDIAN, sum))</span></code></pre></div>
+<div id="aggregate-to-district" class="section level3">
+<h3>Aggregate to district</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>partisanship_agg &lt;-<span class="st"> </span>partisanship <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(district_code) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="st">  </span><span class="co"># for example, sum cumulative patisanship vars</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="kw">across</span>(<span class="kw">contains</span>(<span class="st">&quot;_CUM_&quot;</span>) <span class="op">|</span><span class="st"> </span>PERSONS<span class="op">|</span>BLACK<span class="op">|</span>WHITE<span class="op">|</span>HISPANIC<span class="op">|</span><span class="st"> </span>ASIAN<span class="op">|</span>AMINDIAN, sum))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>partisanship_agg <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+district_code
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+TOT_CUM_10
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+REP_CUM_10
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+DEM_CUM_10
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+TOT_CUM_18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+REP_CUM_18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+DEM_CUM_18
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+PERSONS
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+BLACK
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+WHITE
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+HISPANIC
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+ASIAN
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+AMINDIAN
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4437292
+</td>
+<td style="text-align:right;">
+2280126
+</td>
+<td style="text-align:right;">
+2071947
+</td>
+<td style="text-align:right;">
+4537574
+</td>
+<td style="text-align:right;">
+2442686
+</td>
+<td style="text-align:right;">
+1990024
+</td>
+<td style="text-align:right;">
+710876
+</td>
+<td style="text-align:right;">
+41925
+</td>
+<td style="text-align:right;">
+586219
+</td>
+<td style="text-align:right;">
+63234
+</td>
+<td style="text-align:right;">
+13020
+</td>
+<td style="text-align:right;">
+4069
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+4927711
+</td>
+<td style="text-align:right;">
+1623956
+</td>
+<td style="text-align:right;">
+3146138
+</td>
+<td style="text-align:right;">
+5270304
+</td>
+<td style="text-align:right;">
+1596654
+</td>
+<td style="text-align:right;">
+3545424
+</td>
+<td style="text-align:right;">
+710879
+</td>
+<td style="text-align:right;">
+36961
+</td>
+<td style="text-align:right;">
+597772
+</td>
+<td style="text-align:right;">
+41423
+</td>
+<td style="text-align:right;">
+27450
+</td>
+<td style="text-align:right;">
+4226
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+4412612
+</td>
+<td style="text-align:right;">
+1900706
+</td>
+<td style="text-align:right;">
+2387209
+</td>
+<td style="text-align:right;">
+4382247
+</td>
+<td style="text-align:right;">
+2063236
+</td>
+<td style="text-align:right;">
+2192455
+</td>
+<td style="text-align:right;">
+710852
+</td>
+<td style="text-align:right;">
+9293
+</td>
+<td style="text-align:right;">
+662599
+</td>
+<td style="text-align:right;">
+14983
+</td>
+<td style="text-align:right;">
+15690
+</td>
+<td style="text-align:right;">
+6671
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3993979
+</td>
+<td style="text-align:right;">
+1145711
+</td>
+<td style="text-align:right;">
+2769431
+</td>
+<td style="text-align:right;">
+3970435
+</td>
+<td style="text-align:right;">
+967776
+</td>
+<td style="text-align:right;">
+2916847
+</td>
+<td style="text-align:right;">
+710864
+</td>
+<td style="text-align:right;">
+248291
+</td>
+<td style="text-align:right;">
+314963
+</td>
+<td style="text-align:right;">
+110488
+</td>
+<td style="text-align:right;">
+26002
+</td>
+<td style="text-align:right;">
+5758
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5171517
+</td>
+<td style="text-align:right;">
+3115365
+</td>
+<td style="text-align:right;">
+1956694
+</td>
+<td style="text-align:right;">
+5180957
+</td>
+<td style="text-align:right;">
+3209380
+</td>
+<td style="text-align:right;">
+1861704
+</td>
+<td style="text-align:right;">
+710882
+</td>
+<td style="text-align:right;">
+14595
+</td>
+<td style="text-align:right;">
+636455
+</td>
+<td style="text-align:right;">
+35607
+</td>
+<td style="text-align:right;">
+18369
+</td>
+<td style="text-align:right;">
+3964
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+4764948
+</td>
+<td style="text-align:right;">
+2550134
+</td>
+<td style="text-align:right;">
+2110076
+</td>
+<td style="text-align:right;">
+4646052
+</td>
+<td style="text-align:right;">
+2607838
+</td>
+<td style="text-align:right;">
+1917625
+</td>
+<td style="text-align:right;">
+710866
+</td>
+<td style="text-align:right;">
+13186
+</td>
+<td style="text-align:right;">
+647625
+</td>
+<td style="text-align:right;">
+27087
+</td>
+<td style="text-align:right;">
+16314
+</td>
+<td style="text-align:right;">
+5058
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+4612601
+</td>
+<td style="text-align:right;">
+2190869
+</td>
+<td style="text-align:right;">
+2307569
+</td>
+<td style="text-align:right;">
+4523226
+</td>
+<td style="text-align:right;">
+2472956
+</td>
+<td style="text-align:right;">
+1930310
+</td>
+<td style="text-align:right;">
+710896
+</td>
+<td style="text-align:right;">
+5932
+</td>
+<td style="text-align:right;">
+660631
+</td>
+<td style="text-align:right;">
+12537
+</td>
+<td style="text-align:right;">
+11797
+</td>
+<td style="text-align:right;">
+18472
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+4534299
+</td>
+<td style="text-align:right;">
+2312703
+</td>
+<td style="text-align:right;">
+2120470
+</td>
+<td style="text-align:right;">
+4582730
+</td>
+<td style="text-align:right;">
+2534497
+</td>
+<td style="text-align:right;">
+1926476
+</td>
+<td style="text-align:right;">
+710871
+</td>
+<td style="text-align:right;">
+10477
+</td>
+<td style="text-align:right;">
+632147
+</td>
+<td style="text-align:right;">
+30697
+</td>
+<td style="text-align:right;">
+15289
+</td>
+<td style="text-align:right;">
+20375
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="merge-in-aggregate-partisanship" class="section level3">
 <h3>Merge in aggregate partisanship</h3>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>d3 &lt;-<span class="st"> </span>d2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(partisanship_agg)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>d3 <span class="op">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a>d4 &lt;-<span class="st"> </span>d3 <span class="op">%&gt;%</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(bioname, district_code, icpsr,</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>         <span class="co"># speech</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>         speeches_n, file,</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>         <span class="co"># community</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>         facebook_sci, flow_count,</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>         <span class="co"># race </span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>          BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>         PERSONS, BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,</span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>         <span class="co"># partisanship</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>         <span class="kw">starts_with</span>(<span class="st">&quot;REP&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;DEM&quot;</span>), <span class="kw">starts_with</span>(<span class="st">&quot;OTH&quot;</span>)) <span class="op">%&gt;%</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">distinct</span>() </span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>d4 <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -102909,6 +103296,9 @@ facebook_sci
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 flow_count
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+PERSONS
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 BLACK
@@ -102961,6 +103351,9 @@ CREC-2020-07-09-pt1-PgH3078-6-000108-20537.txt
 </td>
 <td style="text-align:right;">
 523024
+</td>
+<td style="text-align:right;">
+710864
 </td>
 <td style="text-align:right;">
 248291
@@ -103117,17 +103510,6 @@ character
 </td>
 <td style="text-align:left;">
 MOORE, Gwendolynne S. (Gwen)
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-pattern
-</td>
-<td style="text-align:left;">
-character
-</td>
-<td style="text-align:left;">
-gwendolynne moore|gwendolynne s moore|moore|gwen moore|gwen s moore|(^|senator |representative )mooremoore, gwen|moore, gwendolynne|moore gwendolynne|moore, grepresentative mooreg s moore
 </td>
 </tr>
 <tr>
@@ -106788,11 +107170,15 @@ numeric
 </div>
 <div id="save" class="section level1">
 <h1>Save</h1>
-<p>-member_district.Rdata -member_district.csv</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>member_district &lt;-<span class="st"> </span>d3</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="kw">save</span>(member_district, <span class="dt">file =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.Rdata&quot;</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="kw">write_csv</span>(member_district, <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.Rdata&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>member_district &lt;-<span class="st"> </span>d4</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">save</span>(member_district, <span class="dt">file =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.Rdata&quot;</span>))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="kw">write_csv</span>(member_district, <span class="dt">path =</span> here<span class="op">::</span><span class="kw">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;member_district_example.csv&quot;</span>))</span></code></pre></div>
+<ul>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.Rdata">member_district.Rdata</a></li>
+<li><a href="https://github.com/judgelord/redistricting/blob/main/data/member_district_example.csv">member_district.csv</a></li>
+</ul>
 </div>
 
 
