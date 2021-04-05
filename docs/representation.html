@@ -4876,11 +4876,12 @@ flow_count
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>within &lt;-<span class="st"> </span>c <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(from <span class="op">==</span><span class="st"> </span>to)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">left_join</span>(within,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>                <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;district_code&quot;</span> =<span class="st"> &quot;to&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(flow_count)) </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co"># number of speeches</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>d2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">distinct</span>(bioname, cqlabel, flow_count, facebook_sci, speeches_n) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">kablebox</span>()</span></code></pre></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>d2 &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">left_join</span>(within <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">district_code =</span> to) ) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(flow_count)) </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co"># number of speeches</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>d2 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">distinct</span>(bioname, cqlabel, flow_count, facebook_sci, speeches_n) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -103697,7 +103698,7 @@ character
 (WI-04)
 </td>
 <td style="text-align:left;">
-district
+district-key
 </td>
 <td style="text-align:left;">
 voteview
@@ -103821,7 +103822,7 @@ voteview
 Integer 0-99. Identifier for the district that the member represents within their state (e.g. 3 for the Alabama 3rd Congressional District). Senate members are given district_code 0. Members who represent historical “at-large” districts are assigned 99, 98, or 1 in various <a href="https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md" class="uri">https://github.com/voteview/Rvoteview/blob/master/vignettes/README.md</a>
 </td>
 <td style="text-align:left;">
-members
+members, connectivity, demographics, partisanship
 </td>
 </tr>
 <tr>
@@ -103973,7 +103974,7 @@ integer
 4
 </td>
 <td style="text-align:left;">
-connectivity
+district-key
 </td>
 <td style="text-align:left;">
 district code for node 1
@@ -103983,6 +103984,29 @@ district_code
 </td>
 <td style="text-align:left;">
 connectivity
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+to
+</td>
+<td style="text-align:left;">
+integer
+</td>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
 </td>
 </tr>
 <tr>
@@ -104042,7 +104066,7 @@ character
 5001500US5504
 </td>
 <td style="text-align:left;">
-district-demographics
+district-key
 </td>
 <td style="text-align:left;">
 US Census
@@ -104117,7 +104141,7 @@ district-demographics
 US Census
 </td>
 <td style="text-align:left;">
-NA
+party code?
 </td>
 <td style="text-align:left;">
 demographics
@@ -104203,16 +104227,16 @@ character
 NA
 </td>
 <td style="text-align:left;">
-NA
+district-demographics
 </td>
 <td style="text-align:left;">
-NA
+US Census
 </td>
 <td style="text-align:left;">
 Row 5 of CD_DEMO_DATA
 </td>
 <td style="text-align:left;">
-NA
+demographics
 </td>
 </tr>
 <tr>
@@ -104531,7 +104555,7 @@ district-demographics
 US Census
 </td>
 <td style="text-align:left;">
-NA
+ward number
 </td>
 <td style="text-align:left;">
 demographics
@@ -104577,7 +104601,7 @@ district-demographics
 US Census
 </td>
 <td style="text-align:left;">
-NA
+persons over 18?
 </td>
 <td style="text-align:left;">
 demographics
@@ -105520,7 +105544,7 @@ district-partisanship
 NA
 </td>
 <td style="text-align:left;">
-NA
+presidential vote share?
 </td>
 <td style="text-align:left;">
 partisanship
@@ -105543,7 +105567,7 @@ district-partisanship
 NA
 </td>
 <td style="text-align:left;">
-NA
+presidential vote share?
 </td>
 <td style="text-align:left;">
 partisanship
@@ -107590,7 +107614,7 @@ district-partisanship
 NA
 </td>
 <td style="text-align:left;">
-NA
+superintendent?
 </td>
 <td style="text-align:left;">
 partisanship
@@ -107613,7 +107637,7 @@ district-partisanship
 NA
 </td>
 <td style="text-align:left;">
-NA
+superintendent?
 </td>
 <td style="text-align:left;">
 partisanship

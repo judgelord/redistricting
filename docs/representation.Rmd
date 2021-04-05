@@ -173,8 +173,9 @@ c %>% kablebox()
 within <- c %>% filter(from == to)
 
 
-d2 <- d %>% left_join(within,
-                by = c("district_code" = "to")) %>% filter(!is.na(flow_count)) 
+d2 <- d %>% 
+  left_join(within %>% mutate(district_code = to) ) %>% 
+  filter(!is.na(flow_count)) 
 
 # number of speeches
 d2 %>% distinct(bioname, cqlabel, flow_count, facebook_sci, speeches_n) %>% kablebox()
