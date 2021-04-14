@@ -294,6 +294,8 @@ docs <- tibble(
 
 # google doc
 library(googlesheets4)
+gs4_auth(email = "devin.jl@gmail.com")
+
 docs_gs <- read_sheet("https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA")
 
 docs %<>% left_join(docs_gs)
@@ -320,7 +322,7 @@ write_csv(member_district, path = here::here("data", "member_district_example.cs
 
 
 
-# RSQLite database
+# SQLite database
 library(DBI)
 library(RSQLite)
 con <- dbConnect(RSQLite::SQLite(), here::here("data", "member_district_example.sqlite"))
