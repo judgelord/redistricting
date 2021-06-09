@@ -114,7 +114,7 @@ d %>%
 ## Subset to Wisconsin House Reps
 ```{r}
 # House members from WI
-d %<>% filter(state == "wisconsin",
+d %<>% filter(state %in% c("wisconsin", "texas"),
              chamber == "House")
 
 
@@ -155,11 +155,15 @@ fb <- read_csv(here::here("data", "WI_congress_facebook_sci_pop.txt"))  %>%
 names(fb) %<>% str_remove("_C.*")
 
 # cell phone mobility data
-flow <- read_csv(here::here("data", "district_flows_safegraph.txt")) %>%
+flow <- read_csv(here::here("data", "WI_DistrictFlows_January_2020.csv")) %>% mutate(state = "wisconsin") %>% 
+  full_join(read_csv(here::here("data", "TX_DistrictFlows_January_2020.csv")) %>% mutate(state = "texas"))
+
+flow %<>% 
   mutate(OD_Pairs = OD_Pairs %>% str_remove_all("\\(|\\)")) %>% 
   separate(OD_Pairs, into = c("from", "to"), sep = ", ") %>% 
-  mutate_all(as.integer)
+  mutate(across(c(from, to), as.integer))
 
+# names to match facebook data
 names(flow) %<>% str_to_lower()
 
 c <- full_join(fb, flow)
@@ -236,7 +240,9 @@ d2 %>%
 ```{r}
 partisanship <- read_csv(here::here("data", "WI_FULL_WARD_ELECTORAL_DATA_02_TO_18.csv")) %>% 
   mutate(district_code = CON %>% as.integer() ) %>% 
-  select(-NAME)
+  select(-NAME) %>% 
+  #FIXME these data are only for WI
+  mutate(state = "wisconsin")
 
 partisanship %>% kablebox()
 ```
@@ -246,7 +252,7 @@ partisanship %>% kablebox()
 
 ```{r}
 partisanship_agg <- partisanship %>% 
-  group_by(district_code) %>% 
+  group_by(state, district_code) %>% 
   # for example, sum cumulative patisanship vars
   summarise(across(contains("_CUM_") | PERSONS|BLACK|WHITE|HISPANIC| ASIAN|AMINDIAN, sum))
 
@@ -255,10 +261,10 @@ partisanship_agg %>% kablebox()
  
 ### Merge in aggregate partisanship
 ```{r}
-d3 <- d2 %>% left_join(partisanship_agg)
+d3 <- d2 %>% left_join(partisanship_agg) %>% arrange(desc(state))
 
 d4 <- d3 %>%
-  select(bioname, district_code, icpsr,
+  select(bioname, state, district_code, icpsr,
          # speech
          speeches_n, file,
          # community
@@ -267,7 +273,8 @@ d4 <- d3 %>%
          PERSONS, BLACK, WHITE, HISPANIC, ASIAN, AMINDIAN,
          # partisanship
          starts_with("REP"), starts_with("DEM"), starts_with("OTH")) %>%
-  distinct() 
+  distinct() %>% 
+  ungroup()
 
 d4 %>% 
   kablebox()
@@ -281,11 +288,11 @@ d4 %>%
 ```{r}
 docs <- d2 %>% slice(2) %>%
   #FIXME when we figure out long/wide format 
-  left_join(partisanship)
+  left_join(partisanship) %>% ungroup() %>% arrange(desc(state)) 
 
 docs <- tibble(
   variable = names(docs),
-  class = purrr::map_df(docs, class) %>%
+  class = lapply(docs, class) %>%
     unlist(., use.names=FALSE),
   example = docs %>% slice(1) %>% 
     mutate_all(as.character()) %>%
@@ -298,7 +305,7 @@ gs4_auth(email = "devin.jl@gmail.com")
 
 docs_gs <- read_sheet("https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA")
 
-docs %<>% left_join(docs_gs)
+docs %<>% left_join(docs_gs %>% select(-class, -example))
 
 sheet_write(docs,  "https://docs.google.com/spreadsheets/d/1VLX92ZPPMFy3ypocym549vM82SyN27t51-cwcLfIacA", "docs")
 
@@ -319,8 +326,6 @@ save(member_district, file = here::here("data", "member_district_example.Rdata")
 
 # CSV
 write_csv(member_district, path = here::here("data", "member_district_example.csv"))
-
-
 
 # SQLite database
 library(DBI)
