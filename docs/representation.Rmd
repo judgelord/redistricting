@@ -111,7 +111,7 @@ d %>%
 
 ---
 
-## Subset to Wisconsin House Reps
+## Subset to Wisconsin and Texas House Reps
 ```{r}
 # House members from WI
 d %<>% filter(state %in% c("wisconsin", "texas"),
@@ -148,10 +148,10 @@ TODO
 
 We measure travel in two ways:
 
-- Flows between districts (`flow_count`, left)
-- Flows between districts from and two bordering census blocks, (`flow_count_border`, right)
+- Flows between districts (`flow_count`, the top figure below)
+- Flows between districts from and two bordering census blocks, (`flow_count_border`, the bottom figure below)
 
-```{r, out.width= "40%", fig.show='hold'}
+```{r, out.width= "100%", fig.show='hold'}
 include_graphics(here("figs", "flow.png"))
 include_graphics(here("figs", "flow-CBG.png"))
 ```
