@@ -148,10 +148,13 @@ TODO
 
 We measure travel in two ways:
 
-- Flows between districts (`flow_count`)
-- Flows between districts from and two bordering census blocks, (`flow_count_border`)
+- Flows between districts (`flow_count`, left)
+- Flows between districts from and two bordering census blocks, (`flow_count_border`, right)
 
-> TODO: Add images illustrating these from Box
+```{r, out.width= "40%", fig.show='hold'}
+include_graphics(here("figs", "flow.png"))
+include_graphics(here("figs", "flow-CBG.png"))
+```
 
 There are three values for each measure of connectivity:
 
