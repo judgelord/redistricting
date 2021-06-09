@@ -2713,17 +2713,24 @@ measure <em>ratio</em>/log odds of “my district” vs “my conscience” etc.
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;TX_DistrictFlows_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;texas&quot;</span>))</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>flow <span class="sc">%&lt;&gt;%</span> </span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">OD_Pairs =</span> OD_Pairs <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">(|</span><span class="sc">\\</span><span class="st">)&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(OD_Pairs, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;from&quot;</span>, <span class="st">&quot;to&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(from, to), as.integer))</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># names to match facebook data</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(flow) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_to_lower</span>()</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">full_join</span>(fb, flow)</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>c <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>flow_border <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_DistrictFlows_BorderCBGs_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;wisconsin&quot;</span>)  <span class="sc">%&gt;%</span> </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;TX_DistrictFlows_BorderCBGs_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;texas&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Flow_Count_Border =</span> Flow_Count)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>flow <span class="sc">%&lt;&gt;%</span> </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(flow_border) <span class="sc">%&gt;%</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">OD_Pairs =</span> OD_Pairs <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">(|</span><span class="sc">\\</span><span class="st">)&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(OD_Pairs, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;from&quot;</span>, <span class="st">&quot;to&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(from, to), as.integer))</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co"># names to match facebook data</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(flow) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_to_lower</span>()</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">full_join</span>(fb, flow)</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>c <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -2742,6 +2749,9 @@ state
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 flow_count
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_count_border
 </th>
 </tr>
 </thead>
@@ -2762,6 +2772,9 @@ wisconsin
 <td style="text-align:right;">
 3968910
 </td>
+<td style="text-align:right;">
+536612
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2778,6 +2791,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 398091
+</td>
+<td style="text-align:right;">
+119051
 </td>
 </tr>
 <tr>
@@ -2796,6 +2812,9 @@ wisconsin
 <td style="text-align:right;">
 84128
 </td>
+<td style="text-align:right;">
+17937
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2812,6 +2831,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 92224
+</td>
+<td style="text-align:right;">
+28803
 </td>
 </tr>
 <tr>
@@ -2830,6 +2852,9 @@ wisconsin
 <td style="text-align:right;">
 208494
 </td>
+<td style="text-align:right;">
+75011
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2846,6 +2871,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 42553
+</td>
+<td style="text-align:right;">
+6608
 </td>
 </tr>
 <tr>
@@ -2864,6 +2892,9 @@ wisconsin
 <td style="text-align:right;">
 31712
 </td>
+<td style="text-align:right;">
+5750
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2880,6 +2911,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 25037
+</td>
+<td style="text-align:right;">
+3349
 </td>
 </tr>
 <tr>
@@ -2898,6 +2932,9 @@ wisconsin
 <td style="text-align:right;">
 452578
 </td>
+<td style="text-align:right;">
+170684
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2914,6 +2951,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 3637086
+</td>
+<td style="text-align:right;">
+317339
 </td>
 </tr>
 <tr>
@@ -2932,6 +2972,9 @@ wisconsin
 <td style="text-align:right;">
 99292
 </td>
+<td style="text-align:right;">
+20837
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2948,6 +2991,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 42741
+</td>
+<td style="text-align:right;">
+4981
 </td>
 </tr>
 <tr>
@@ -2966,6 +3012,9 @@ wisconsin
 <td style="text-align:right;">
 34452
 </td>
+<td style="text-align:right;">
+7459
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2982,6 +3031,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 24001
+</td>
+<td style="text-align:right;">
+3100
 </td>
 </tr>
 <tr>
@@ -3000,6 +3052,9 @@ wisconsin
 <td style="text-align:right;">
 18777
 </td>
+<td style="text-align:right;">
+2704
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3016,6 +3071,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 13198
+</td>
+<td style="text-align:right;">
+1829
 </td>
 </tr>
 <tr>
@@ -3034,6 +3092,9 @@ wisconsin
 <td style="text-align:right;">
 75732
 </td>
+<td style="text-align:right;">
+19449
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3050,6 +3111,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 126742
+</td>
+<td style="text-align:right;">
+29621
 </td>
 </tr>
 <tr>
@@ -3068,6 +3132,9 @@ wisconsin
 <td style="text-align:right;">
 5062438
 </td>
+<td style="text-align:right;">
+427400
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3084,6 +3151,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 491014
+</td>
+<td style="text-align:right;">
+135838
 </td>
 </tr>
 <tr>
@@ -3102,6 +3172,9 @@ wisconsin
 <td style="text-align:right;">
 34738
 </td>
+<td style="text-align:right;">
+4338
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3118,6 +3191,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 48166
+</td>
+<td style="text-align:right;">
+6459
 </td>
 </tr>
 <tr>
@@ -3136,6 +3212,9 @@ wisconsin
 <td style="text-align:right;">
 29529
 </td>
+<td style="text-align:right;">
+3533
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3152,6 +3231,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 42324
+</td>
+<td style="text-align:right;">
+5266
 </td>
 </tr>
 <tr>
@@ -3170,6 +3252,9 @@ wisconsin
 <td style="text-align:right;">
 96251
 </td>
+<td style="text-align:right;">
+27187
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3186,6 +3271,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 61799
+</td>
+<td style="text-align:right;">
+15288
 </td>
 </tr>
 <tr>
@@ -3204,6 +3292,9 @@ wisconsin
 <td style="text-align:right;">
 574205
 </td>
+<td style="text-align:right;">
+170342
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3220,6 +3311,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 4024884
+</td>
+<td style="text-align:right;">
+584179
 </td>
 </tr>
 <tr>
@@ -3238,6 +3332,9 @@ wisconsin
 <td style="text-align:right;">
 244893
 </td>
+<td style="text-align:right;">
+86511
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3254,6 +3351,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 332252
+</td>
+<td style="text-align:right;">
+91452
 </td>
 </tr>
 <tr>
@@ -3272,6 +3372,9 @@ wisconsin
 <td style="text-align:right;">
 55877
 </td>
+<td style="text-align:right;">
+11304
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3288,6 +3391,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 163236
+</td>
+<td style="text-align:right;">
+44331
 </td>
 </tr>
 <tr>
@@ -3306,6 +3412,9 @@ wisconsin
 <td style="text-align:right;">
 165926
 </td>
+<td style="text-align:right;">
+47230
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3322,6 +3431,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 47907
+</td>
+<td style="text-align:right;">
+5822
 </td>
 </tr>
 <tr>
@@ -3340,6 +3452,9 @@ wisconsin
 <td style="text-align:right;">
 42890
 </td>
+<td style="text-align:right;">
+3530
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3356,6 +3471,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 145951
+</td>
+<td style="text-align:right;">
+23357
 </td>
 </tr>
 <tr>
@@ -3374,6 +3492,9 @@ wisconsin
 <td style="text-align:right;">
 4336161
 </td>
+<td style="text-align:right;">
+304703
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3390,6 +3511,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 135898
+</td>
+<td style="text-align:right;">
+21677
 </td>
 </tr>
 <tr>
@@ -3408,6 +3532,9 @@ wisconsin
 <td style="text-align:right;">
 290783
 </td>
+<td style="text-align:right;">
+71849
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3424,6 +3551,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 49599
+</td>
+<td style="text-align:right;">
+3350
 </td>
 </tr>
 <tr>
@@ -3442,6 +3572,9 @@ wisconsin
 <td style="text-align:right;">
 56627
 </td>
+<td style="text-align:right;">
+13665
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3458,6 +3591,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 52257
+</td>
+<td style="text-align:right;">
+12934
 </td>
 </tr>
 <tr>
@@ -3476,6 +3612,9 @@ wisconsin
 <td style="text-align:right;">
 68120
 </td>
+<td style="text-align:right;">
+15557
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3492,6 +3631,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 292751
+</td>
+<td style="text-align:right;">
+96081
 </td>
 </tr>
 <tr>
@@ -3510,6 +3652,9 @@ wisconsin
 <td style="text-align:right;">
 174371
 </td>
+<td style="text-align:right;">
+56106
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3526,6 +3671,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 4686964
+</td>
+<td style="text-align:right;">
+996047
 </td>
 </tr>
 <tr>
@@ -3544,6 +3692,9 @@ wisconsin
 <td style="text-align:right;">
 490858
 </td>
+<td style="text-align:right;">
+185760
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3560,6 +3711,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 598954
+</td>
+<td style="text-align:right;">
+264381
 </td>
 </tr>
 <tr>
@@ -3578,6 +3732,9 @@ wisconsin
 <td style="text-align:right;">
 50420
 </td>
+<td style="text-align:right;">
+7849
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3594,6 +3751,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 39307
+</td>
+<td style="text-align:right;">
+5197
 </td>
 </tr>
 <tr>
@@ -3612,6 +3772,9 @@ wisconsin
 <td style="text-align:right;">
 38345
 </td>
+<td style="text-align:right;">
+5188
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3628,6 +3791,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 70673
+</td>
+<td style="text-align:right;">
+13034
 </td>
 </tr>
 <tr>
@@ -3646,6 +3812,9 @@ wisconsin
 <td style="text-align:right;">
 205733
 </td>
+<td style="text-align:right;">
+50009
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3662,6 +3831,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 811577
+</td>
+<td style="text-align:right;">
+260193
 </td>
 </tr>
 <tr>
@@ -3680,6 +3852,9 @@ wisconsin
 <td style="text-align:right;">
 4452396
 </td>
+<td style="text-align:right;">
+354047
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3696,6 +3871,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 342843
+</td>
+<td style="text-align:right;">
+75242
 </td>
 </tr>
 <tr>
@@ -3714,6 +3892,9 @@ wisconsin
 <td style="text-align:right;">
 21763
 </td>
+<td style="text-align:right;">
+4769
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3730,6 +3911,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 18008
+</td>
+<td style="text-align:right;">
+3977
 </td>
 </tr>
 <tr>
@@ -3748,6 +3932,9 @@ wisconsin
 <td style="text-align:right;">
 44338
 </td>
+<td style="text-align:right;">
+7339
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3764,6 +3951,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 181514
+</td>
+<td style="text-align:right;">
+46024
 </td>
 </tr>
 <tr>
@@ -3782,6 +3972,9 @@ wisconsin
 <td style="text-align:right;">
 46705
 </td>
+<td style="text-align:right;">
+10789
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3798,6 +3991,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 1277825
+</td>
+<td style="text-align:right;">
+398318
 </td>
 </tr>
 <tr>
@@ -3816,6 +4012,9 @@ wisconsin
 <td style="text-align:right;">
 513597
 </td>
+<td style="text-align:right;">
+149146
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3832,6 +4031,9 @@ wisconsin
 </td>
 <td style="text-align:right;">
 4389604
+</td>
+<td style="text-align:right;">
+667951
 </td>
 </tr>
 <tr>
@@ -3850,6 +4052,9 @@ texas
 <td style="text-align:right;">
 6786158
 </td>
+<td style="text-align:right;">
+1034834
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3866,6 +4071,9 @@ texas
 </td>
 <td style="text-align:right;">
 25485
+</td>
+<td style="text-align:right;">
+3909
 </td>
 </tr>
 <tr>
@@ -3884,6 +4092,9 @@ texas
 <td style="text-align:right;">
 44697
 </td>
+<td style="text-align:right;">
+7738
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3900,6 +4111,9 @@ texas
 </td>
 <td style="text-align:right;">
 258652
+</td>
+<td style="text-align:right;">
+88691
 </td>
 </tr>
 <tr>
@@ -3918,6 +4132,9 @@ texas
 <td style="text-align:right;">
 398885
 </td>
+<td style="text-align:right;">
+117133
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3934,6 +4151,9 @@ texas
 </td>
 <td style="text-align:right;">
 41114
+</td>
+<td style="text-align:right;">
+6672
 </td>
 </tr>
 <tr>
@@ -3952,6 +4172,9 @@ texas
 <td style="text-align:right;">
 17823
 </td>
+<td style="text-align:right;">
+2324
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3968,6 +4191,9 @@ texas
 </td>
 <td style="text-align:right;">
 91831
+</td>
+<td style="text-align:right;">
+16263
 </td>
 </tr>
 <tr>
@@ -3986,6 +4212,9 @@ texas
 <td style="text-align:right;">
 9551
 </td>
+<td style="text-align:right;">
+1318
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4002,6 +4231,9 @@ texas
 </td>
 <td style="text-align:right;">
 22936
+</td>
+<td style="text-align:right;">
+4396
 </td>
 </tr>
 <tr>
@@ -4020,6 +4252,9 @@ texas
 <td style="text-align:right;">
 29786
 </td>
+<td style="text-align:right;">
+5995
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4036,6 +4271,9 @@ texas
 </td>
 <td style="text-align:right;">
 31199
+</td>
+<td style="text-align:right;">
+4586
 </td>
 </tr>
 <tr>
@@ -4054,6 +4292,9 @@ texas
 <td style="text-align:right;">
 18342
 </td>
+<td style="text-align:right;">
+3352
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4070,6 +4311,9 @@ texas
 </td>
 <td style="text-align:right;">
 41803
+</td>
+<td style="text-align:right;">
+9687
 </td>
 </tr>
 <tr>
@@ -4088,6 +4332,9 @@ texas
 <td style="text-align:right;">
 5801
 </td>
+<td style="text-align:right;">
+1020
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4104,6 +4351,9 @@ texas
 </td>
 <td style="text-align:right;">
 1470
+</td>
+<td style="text-align:right;">
+180
 </td>
 </tr>
 <tr>
@@ -4122,6 +4372,9 @@ texas
 <td style="text-align:right;">
 63750
 </td>
+<td style="text-align:right;">
+10702
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4138,6 +4391,9 @@ texas
 </td>
 <td style="text-align:right;">
 21341
+</td>
+<td style="text-align:right;">
+2548
 </td>
 </tr>
 <tr>
@@ -4156,6 +4412,9 @@ texas
 <td style="text-align:right;">
 16188
 </td>
+<td style="text-align:right;">
+2546
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4172,6 +4431,9 @@ texas
 </td>
 <td style="text-align:right;">
 4856
+</td>
+<td style="text-align:right;">
+901
 </td>
 </tr>
 <tr>
@@ -4190,6 +4452,9 @@ texas
 <td style="text-align:right;">
 18021
 </td>
+<td style="text-align:right;">
+3099
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4206,6 +4471,9 @@ texas
 </td>
 <td style="text-align:right;">
 18003
+</td>
+<td style="text-align:right;">
+2359
 </td>
 </tr>
 <tr>
@@ -4224,6 +4492,9 @@ texas
 <td style="text-align:right;">
 12205
 </td>
+<td style="text-align:right;">
+2520
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4240,6 +4511,9 @@ texas
 </td>
 <td style="text-align:right;">
 48953
+</td>
+<td style="text-align:right;">
+7475
 </td>
 </tr>
 <tr>
@@ -4258,6 +4532,9 @@ texas
 <td style="text-align:right;">
 19596
 </td>
+<td style="text-align:right;">
+3873
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4274,6 +4551,9 @@ texas
 </td>
 <td style="text-align:right;">
 27028
+</td>
+<td style="text-align:right;">
+3641
 </td>
 </tr>
 <tr>
@@ -4292,6 +4572,9 @@ texas
 <td style="text-align:right;">
 14881
 </td>
+<td style="text-align:right;">
+2067
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4308,6 +4591,9 @@ texas
 </td>
 <td style="text-align:right;">
 5672
+</td>
+<td style="text-align:right;">
+1091
 </td>
 </tr>
 <tr>
@@ -4326,6 +4612,9 @@ texas
 <td style="text-align:right;">
 14064
 </td>
+<td style="text-align:right;">
+1713
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4342,6 +4631,9 @@ texas
 </td>
 <td style="text-align:right;">
 51743
+</td>
+<td style="text-align:right;">
+7395
 </td>
 </tr>
 <tr>
@@ -4360,6 +4652,9 @@ texas
 <td style="text-align:right;">
 19839
 </td>
+<td style="text-align:right;">
+3426
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4376,6 +4671,9 @@ texas
 </td>
 <td style="text-align:right;">
 44375
+</td>
+<td style="text-align:right;">
+6230
 </td>
 </tr>
 <tr>
@@ -4394,6 +4692,9 @@ texas
 <td style="text-align:right;">
 31274
 </td>
+<td style="text-align:right;">
+4661
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4410,6 +4711,9 @@ texas
 </td>
 <td style="text-align:right;">
 4819
+</td>
+<td style="text-align:right;">
+1104
 </td>
 </tr>
 <tr>
@@ -4428,6 +4732,9 @@ texas
 <td style="text-align:right;">
 13094
 </td>
+<td style="text-align:right;">
+1936
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4445,6 +4752,9 @@ texas
 <td style="text-align:right;">
 118009
 </td>
+<td style="text-align:right;">
+31501
+</td>
 </tr>
 </tbody>
 </table>
@@ -4459,7 +4769,7 @@ texas
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(flow_count)) </span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># number of speeches</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>d2 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(bioname, cqlabel, flow_count, facebook_sci, speeches_n) <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>d2 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(bioname, cqlabel, flow_count, flow_count_border, facebook_sci, speeches_n) <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -4481,6 +4791,9 @@ facebook_sci
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 flow_count
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_count_border
 </th>
 </tr>
 </thead>
@@ -4504,6 +4817,9 @@ NA
 <td style="text-align:right;">
 4465371
 </td>
+<td style="text-align:right;">
+1182073
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4523,6 +4839,9 @@ NA
 </td>
 <td style="text-align:right;">
 3906385
+</td>
+<td style="text-align:right;">
+1932209
 </td>
 </tr>
 <tr>
@@ -4544,6 +4863,9 @@ MOORE, Gwendolynne S. (Gwen)
 <td style="text-align:right;">
 4389604
 </td>
+<td style="text-align:right;">
+667951
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4563,6 +4885,9 @@ NA
 </td>
 <td style="text-align:right;">
 4477506
+</td>
+<td style="text-align:right;">
+1664592
 </td>
 </tr>
 <tr>
@@ -4584,6 +4909,9 @@ NA
 <td style="text-align:right;">
 5115287
 </td>
+<td style="text-align:right;">
+1460108
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4603,6 +4931,9 @@ NA
 </td>
 <td style="text-align:right;">
 4982044
+</td>
+<td style="text-align:right;">
+858822
 </td>
 </tr>
 <tr>
@@ -4624,6 +4955,9 @@ NA
 <td style="text-align:right;">
 7055603
 </td>
+<td style="text-align:right;">
+469162
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4643,6 +4977,9 @@ NA
 </td>
 <td style="text-align:right;">
 4465371
+</td>
+<td style="text-align:right;">
+1182073
 </td>
 </tr>
 </tbody>
@@ -105176,6 +105513,29 @@ within-district travel
 </td>
 <td style="text-align:left;">
 connectivity
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+flow_count_border
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+667951
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
 </td>
 </tr>
 <tr>

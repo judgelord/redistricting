@@ -161,7 +161,14 @@ flow <- read_csv(here::here("data", "WI_DistrictFlows_January_2020.csv")) %>%
   full_join(read_csv(here::here("data", "TX_DistrictFlows_January_2020.csv")) %>% 
               mutate(state = "texas"))
 
+flow_border <- read_csv(here::here("data", "WI_DistrictFlows_BorderCBGs_January_2020.csv")) %>%
+                   mutate(state = "wisconsin")  %>% 
+  full_join(read_csv(here::here("data", "TX_DistrictFlows_BorderCBGs_January_2020.csv")) %>% 
+              mutate(state = "texas")) %>% 
+  rename(Flow_Count_Border = Flow_Count)
+
 flow %<>% 
+  full_join(flow_border) %>%
   mutate(OD_Pairs = OD_Pairs %>% str_remove_all("\\(|\\)")) %>% 
   separate(OD_Pairs, into = c("from", "to"), sep = ", ") %>% 
   mutate(across(c(from, to), as.integer))
@@ -185,7 +192,7 @@ d2 <- d %>%
   filter(!is.na(flow_count)) 
 
 # number of speeches
-d2 %>% distinct(bioname, cqlabel, flow_count, facebook_sci, speeches_n) %>% kablebox()
+d2 %>% distinct(bioname, cqlabel, flow_count, flow_count_border, facebook_sci, speeches_n) %>% kablebox()
 ```
 
 ## Demographics
