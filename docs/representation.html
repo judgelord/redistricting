@@ -2700,6 +2700,20 @@ measure <em>ratio</em>/log odds of “my district” vs “my conscience” etc.
 <li><a href="https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt">Facebook friendships</a> (<code>facebook_sci</code>)</li>
 <li><a href="https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt">Travel</a> (<code>flow_count</code>)</li>
 </ul>
+<p>We measure travel in two ways:</p>
+<ul>
+<li>Flows between districts (<code>flow_count</code>)</li>
+<li>Flows between districts from and two bordering census blocks, (<code>flow_count_border</code>)</li>
+</ul>
+<blockquote>
+<p>TODO: Add images illustrating these from Box</p>
+</blockquote>
+<p>There are three values for each measure of connectivity:</p>
+<ul>
+<li>within-district</li>
+<li><code>out</code>-of-district</li>
+<li>the <code>ratio</code> of within-district to out-of-district travel</li>
+</ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># facebook friend data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_congress_facebook_sci_pop.txt&quot;</span>))  <span class="sc">%&gt;%</span> </span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_all</span>(as.integer) <span class="sc">%&gt;%</span> </span>
@@ -4759,17 +4773,30 @@ texas
 </tbody>
 </table>
 </div>
-<div id="merge-in-within-district-connectivity" class="section level3">
-<h3>Merge in within-district connectivity</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>within <span class="ot">&lt;-</span> c <span class="sc">%&gt;%</span> <span class="fu">filter</span>(from <span class="sc">==</span> to)</span>
+<div id="merge-in-connectivity" class="section level3">
+<h3>Merge in connectivity</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>flow_within <span class="ot">&lt;-</span> c <span class="sc">%&gt;%</span> <span class="fu">filter</span>(from <span class="sc">==</span> to)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(within <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">district_code =</span> to) ) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(flow_count)) </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>flow_out <span class="ot">&lt;-</span> c <span class="sc">%&gt;%</span> <span class="fu">filter</span>(from <span class="sc">!=</span> to) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>to) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, from) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(sum) </span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># number of speeches</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>d2 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(bioname, cqlabel, flow_count, flow_count_border, facebook_sci, speeches_n) <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>flows <span class="ot">&lt;-</span> <span class="fu">full_join</span>(flow_within, flow_out, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;state&quot;</span>, <span class="st">&quot;from&quot;</span>), <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;_out&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">flow_ratio =</span> flow_count<span class="sc">/</span>flow_count_out,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">flow_ratio_border =</span> flow_count_border<span class="sc">/</span>flow_count_border_out,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">facebook_sci_ratio =</span> facebook_sci<span class="sc">/</span>facebook_sci_out) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">district_code =</span> to)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> d <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(flows) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(flow_count)) </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># number of speeches</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>d2 <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(bioname, cqlabel, </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                flow_count, flow_count_out, flow_count_border, flow_count, flow_count_border_out, flow_ratio_border, facebook_sci, facebook_sci_out,facebook_sci_ratio, speeches_n) <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -4794,6 +4821,21 @@ flow_count
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 flow_count_border
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+facebook_sci_out
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_count_out
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_count_border_out
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_ratio_border
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+facebook_sci_ratio
 </th>
 </tr>
 </thead>
@@ -4820,6 +4862,21 @@ NA
 <td style="text-align:right;">
 1182073
 </td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+3951303
+</td>
+<td style="text-align:right;">
+1514025
+</td>
+<td style="text-align:right;">
+0.7807487
+</td>
+<td style="text-align:right;">
+NA
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4842,6 +4899,21 @@ NA
 </td>
 <td style="text-align:right;">
 1932209
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+5103014
+</td>
+<td style="text-align:right;">
+3012360
+</td>
+<td style="text-align:right;">
+0.6414270
+</td>
+<td style="text-align:right;">
+NA
 </td>
 </tr>
 <tr>
@@ -4866,6 +4938,21 @@ MOORE, Gwendolynne S. (Gwen)
 <td style="text-align:right;">
 667951
 </td>
+<td style="text-align:right;">
+180506
+</td>
+<td style="text-align:right;">
+2103750
+</td>
+<td style="text-align:right;">
+620362
+</td>
+<td style="text-align:right;">
+1.0767117
+</td>
+<td style="text-align:right;">
+6.029872
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4888,6 +4975,21 @@ NA
 </td>
 <td style="text-align:right;">
 1664592
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+4356329
+</td>
+<td style="text-align:right;">
+2132982
+</td>
+<td style="text-align:right;">
+0.7804060
+</td>
+<td style="text-align:right;">
+NA
 </td>
 </tr>
 <tr>
@@ -4912,6 +5014,21 @@ NA
 <td style="text-align:right;">
 1460108
 </td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+3604746
+</td>
+<td style="text-align:right;">
+1269960
+</td>
+<td style="text-align:right;">
+1.1497276
+</td>
+<td style="text-align:right;">
+NA
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4934,6 +5051,21 @@ NA
 </td>
 <td style="text-align:right;">
 858822
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+3677391
+</td>
+<td style="text-align:right;">
+967782
+</td>
+<td style="text-align:right;">
+0.8874127
+</td>
+<td style="text-align:right;">
+NA
 </td>
 </tr>
 <tr>
@@ -4958,6 +5090,21 @@ NA
 <td style="text-align:right;">
 469162
 </td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+1376549
+</td>
+<td style="text-align:right;">
+187738
+</td>
+<td style="text-align:right;">
+2.4990252
+</td>
+<td style="text-align:right;">
+NA
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4980,6 +5127,21 @@ NA
 </td>
 <td style="text-align:right;">
 1182073
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+3951303
+</td>
+<td style="text-align:right;">
+1514025
+</td>
+<td style="text-align:right;">
+0.7807487
+</td>
+<td style="text-align:right;">
+NA
 </td>
 </tr>
 </tbody>
@@ -105448,29 +105610,6 @@ connectivity
 </tr>
 <tr>
 <td style="text-align:left;">
-to
-</td>
-<td style="text-align:left;">
-integer
-</td>
-<td style="text-align:left;">
-4
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 facebook_sci
 </td>
 <td style="text-align:left;">
@@ -105524,6 +105663,144 @@ numeric
 </td>
 <td style="text-align:left;">
 667951
+</td>
+<td style="text-align:left;">
+connectivity
+</td>
+<td style="text-align:left;">
+<a href="https://www.safegraph.com/" class="uri">https://www.safegraph.com/</a>
+</td>
+<td style="text-align:left;">
+within-district travel in border census blocks
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+facebook_sci_out
+</td>
+<td style="text-align:left;">
+integer
+</td>
+<td style="text-align:left;">
+180506
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+flow_count_out
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+2103750
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+flow_count_border_out
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+620362
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+flow_ratio
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+2.086562
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+flow_ratio_border
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+1.076712
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+facebook_sci_ratio
+</td>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+6.029872
 </td>
 <td style="text-align:left;">
 NA

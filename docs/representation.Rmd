@@ -146,6 +146,18 @@ TODO
 - [Facebook friendships](https://github.com/judgelord/redistricting/blob/main/data/WI_congress_facebook_sci_pop.txt) (`facebook_sci`)
 - [Travel](https://github.com/judgelord/redistricting/blob/main/data/district_flows_safegraph.txt) (`flow_count`)
 
+We measure travel in two ways:
+
+- Flows between districts (`flow_count`)
+- Flows between districts from and two bordering census blocks, (`flow_count_border`)
+
+> TODO: Add images illustrating these from Box
+
+There are three values for each measure of connectivity:
+
+- within-district 
+- `out`-of-district 
+- the `ratio` of within-district to out-of-district travel
 
 ```{r}
 # facebook friend data
@@ -181,18 +193,33 @@ c <- full_join(fb, flow)
 c %>% kablebox()
 ```
 
-### Merge in within-district connectivity
+### Merge in connectivity
+
+
 
 ```{r}
-within <- c %>% filter(from == to)
+flow_within <- c %>% filter(from == to)
+
+flow_out <- c %>% filter(from != to) %>%
+  select(-to) %>%
+  group_by(state, from) %>% 
+  summarise_all(sum) 
+
+flows <- full_join(flow_within, flow_out, by = c("state", "from"), suffix = c("", "_out")) %>%
+  mutate(flow_ratio = flow_count/flow_count_out,
+         flow_ratio_border = flow_count_border/flow_count_border_out,
+         facebook_sci_ratio = facebook_sci/facebook_sci_out) %>% 
+  rename(district_code = to)
+
 
 
 d2 <- d %>% 
-  left_join(within %>% mutate(district_code = to) ) %>% 
+  left_join(flows) %>% 
   filter(!is.na(flow_count)) 
 
 # number of speeches
-d2 %>% distinct(bioname, cqlabel, flow_count, flow_count_border, facebook_sci, speeches_n) %>% kablebox()
+d2 %>% distinct(bioname, cqlabel, 
+                flow_count, flow_count_out, flow_count_border, flow_count, flow_count_border_out, flow_ratio_border, facebook_sci, facebook_sci_out,facebook_sci_ratio, speeches_n) %>% kablebox()
 ```
 
 ## Demographics
