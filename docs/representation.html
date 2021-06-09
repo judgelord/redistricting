@@ -2702,25 +2702,28 @@ measure <em>ratio</em>/log odds of “my district” vs “my conscience” etc.
 </ul>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># facebook friend data</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fb <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_congress_facebook_sci_pop.txt&quot;</span>))  <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_all</span>(as.integer)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(fb) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;_C.*&quot;</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># cell phone mobility data</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>flow <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_DistrictFlows_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;wisconsin&quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;TX_DistrictFlows_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;texas&quot;</span>))</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>flow <span class="sc">%&lt;&gt;%</span> </span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">OD_Pairs =</span> OD_Pairs <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">(|</span><span class="sc">\\</span><span class="st">)&quot;</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(OD_Pairs, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;from&quot;</span>, <span class="st">&quot;to&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(from, to), as.integer))</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># names to match facebook data</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(flow) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_to_lower</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_all</span>(as.integer) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;wisconsin&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(fb) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_remove</span>(<span class="st">&quot;_C.*&quot;</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># cell phone mobility data</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>flow <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;WI_DistrictFlows_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;wisconsin&quot;</span>)  <span class="sc">%&gt;%</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">full_join</span>(<span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;TX_DistrictFlows_January_2020.csv&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">state =</span> <span class="st">&quot;texas&quot;</span>))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>flow <span class="sc">%&lt;&gt;%</span> </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">OD_Pairs =</span> OD_Pairs <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">(|</span><span class="sc">\\</span><span class="st">)&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(OD_Pairs, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;from&quot;</span>, <span class="st">&quot;to&quot;</span>), <span class="at">sep =</span> <span class="st">&quot;, &quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(from, to), as.integer))</span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">full_join</span>(fb, flow)</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>c <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co"># names to match facebook data</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(flow) <span class="sc">%&lt;&gt;%</span> <span class="fu">str_to_lower</span>()</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">full_join</span>(fb, flow)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>c <span class="sc">%&gt;%</span> <span class="fu">kablebox</span>()</span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; ">
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -2734,11 +2737,11 @@ to
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 facebook_sci
 </th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-flow_count
-</th>
 <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 state
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+flow_count
 </th>
 </tr>
 </thead>
@@ -2753,28 +2756,11 @@ state
 <td style="text-align:right;">
 850188
 </td>
-<td style="text-align:right;">
-3968910
-</td>
 <td style="text-align:left;">
 wisconsin
 </td>
-</tr>
-<tr>
 <td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-850188
-</td>
-<td style="text-align:right;">
-6596739
-</td>
-<td style="text-align:left;">
-texas
+3968910
 </td>
 </tr>
 <tr>
@@ -2786,30 +2772,13 @@ texas
 </td>
 <td style="text-align:right;">
 148902
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 398091
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-148902
-</td>
-<td style="text-align:right;">
-7939
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2820,30 +2789,13 @@ texas
 </td>
 <td style="text-align:right;">
 52823
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 84128
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-52823
-</td>
-<td style="text-align:right;">
-18496
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2854,30 +2806,13 @@ texas
 </td>
 <td style="text-align:right;">
 87065
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 92224
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-87065
-</td>
-<td style="text-align:right;">
-73455
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2888,30 +2823,13 @@ texas
 </td>
 <td style="text-align:right;">
 125696
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 208494
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-125696
-</td>
-<td style="text-align:right;">
-8129
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2922,30 +2840,13 @@ texas
 </td>
 <td style="text-align:right;">
 74046
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 42553
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-74046
-</td>
-<td style="text-align:right;">
-148891
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2956,30 +2857,13 @@ texas
 </td>
 <td style="text-align:right;">
 39737
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 31712
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-39737
-</td>
-<td style="text-align:right;">
-27616
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2990,30 +2874,13 @@ texas
 </td>
 <td style="text-align:right;">
 178845
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 25037
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-178845
-</td>
-<td style="text-align:right;">
-257841
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3024,30 +2891,13 @@ texas
 </td>
 <td style="text-align:right;">
 165021
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 452578
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-165021
-</td>
-<td style="text-align:right;">
-10935
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3058,30 +2908,13 @@ texas
 </td>
 <td style="text-align:right;">
 803742
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 3637086
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-803742
-</td>
-<td style="text-align:right;">
-4118559
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3092,30 +2925,13 @@ texas
 </td>
 <td style="text-align:right;">
 71147
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 99292
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-71147
-</td>
-<td style="text-align:right;">
-164847
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3126,30 +2942,13 @@ texas
 </td>
 <td style="text-align:right;">
 97058
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 42741
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-97058
-</td>
-<td style="text-align:right;">
-10491
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3160,30 +2959,13 @@ texas
 </td>
 <td style="text-align:right;">
 53345
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 34452
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-53345
-</td>
-<td style="text-align:right;">
-1028765
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3194,30 +2976,13 @@ texas
 </td>
 <td style="text-align:right;">
 66113
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 24001
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-66113
-</td>
-<td style="text-align:right;">
-5966
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3228,30 +2993,13 @@ texas
 </td>
 <td style="text-align:right;">
 33045
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 18777
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-33045
-</td>
-<td style="text-align:right;">
-15520
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3262,30 +3010,13 @@ texas
 </td>
 <td style="text-align:right;">
 154633
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 13198
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-154633
-</td>
-<td style="text-align:right;">
-6090
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3296,30 +3027,13 @@ texas
 </td>
 <td style="text-align:right;">
 34760
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 75732
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-34760
-</td>
-<td style="text-align:right;">
-17036
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3330,30 +3044,13 @@ texas
 </td>
 <td style="text-align:right;">
 38310
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 126742
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-38310
-</td>
-<td style="text-align:right;">
-198821
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3364,30 +3061,13 @@ texas
 </td>
 <td style="text-align:right;">
 995091
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 5062438
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-995091
-</td>
-<td style="text-align:right;">
-5718536
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3398,30 +3078,13 @@ texas
 </td>
 <td style="text-align:right;">
 294671
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 491014
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-294671
-</td>
-<td style="text-align:right;">
-27932
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3432,30 +3095,13 @@ texas
 </td>
 <td style="text-align:right;">
 53987
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 34738
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-53987
-</td>
-<td style="text-align:right;">
-849368
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3466,30 +3112,13 @@ texas
 </td>
 <td style="text-align:right;">
 76712
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 48166
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-76712
-</td>
-<td style="text-align:right;">
-55645
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3500,30 +3129,13 @@ texas
 </td>
 <td style="text-align:right;">
 31113
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 29529
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-31113
-</td>
-<td style="text-align:right;">
-101369
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3534,30 +3146,13 @@ texas
 </td>
 <td style="text-align:right;">
 255431
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 42324
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-255431
-</td>
-<td style="text-align:right;">
-16348
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3568,30 +3163,13 @@ texas
 </td>
 <td style="text-align:right;">
 40251
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 96251
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-40251
-</td>
-<td style="text-align:right;">
-102760
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3602,30 +3180,13 @@ texas
 </td>
 <td style="text-align:right;">
 23490
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 61799
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-23490
-</td>
-<td style="text-align:right;">
-6435
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3636,30 +3197,13 @@ texas
 </td>
 <td style="text-align:right;">
 162849
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 574205
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-162849
-</td>
-<td style="text-align:right;">
-22605
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3670,30 +3214,13 @@ texas
 </td>
 <td style="text-align:right;">
 933867
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 4024884
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-933867
-</td>
-<td style="text-align:right;">
-5114884
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3704,30 +3231,13 @@ texas
 </td>
 <td style="text-align:right;">
 118606
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 244893
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-118606
-</td>
-<td style="text-align:right;">
-7111
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3738,30 +3248,13 @@ texas
 </td>
 <td style="text-align:right;">
 193300
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 332252
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-193300
-</td>
-<td style="text-align:right;">
-148517
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3772,30 +3265,13 @@ texas
 </td>
 <td style="text-align:right;">
 49080
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 55877
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-49080
-</td>
-<td style="text-align:right;">
-33695
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3806,30 +3282,13 @@ texas
 </td>
 <td style="text-align:right;">
 496138
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 163236
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-496138
-</td>
-<td style="text-align:right;">
-62097
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3840,30 +3299,13 @@ texas
 </td>
 <td style="text-align:right;">
 52595
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 165926
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-52595
-</td>
-<td style="text-align:right;">
-15688
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3874,30 +3316,13 @@ texas
 </td>
 <td style="text-align:right;">
 11855
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 47907
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-11855
-</td>
-<td style="text-align:right;">
-1010237
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3908,30 +3333,13 @@ texas
 </td>
 <td style="text-align:right;">
 22448
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 42890
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-8
-</td>
-<td style="text-align:right;">
-22448
-</td>
-<td style="text-align:right;">
-807187
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3942,30 +3350,13 @@ texas
 </td>
 <td style="text-align:right;">
 45165
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 145951
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-6
-</td>
-<td style="text-align:right;">
-45165
-</td>
-<td style="text-align:right;">
-15608
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -3976,30 +3367,13 @@ texas
 </td>
 <td style="text-align:right;">
 765383
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 4336161
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-765383
-</td>
-<td style="text-align:right;">
-3906385
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4010,30 +3384,13 @@ texas
 </td>
 <td style="text-align:right;">
 56364
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 135898
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-56364
-</td>
-<td style="text-align:right;">
-11359
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4044,30 +3401,13 @@ texas
 </td>
 <td style="text-align:right;">
 49834
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 290783
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-49834
-</td>
-<td style="text-align:right;">
-27077
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4078,30 +3418,13 @@ texas
 </td>
 <td style="text-align:right;">
 138515
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 49599
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-138515
-</td>
-<td style="text-align:right;">
-8230
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4112,30 +3435,13 @@ texas
 </td>
 <td style="text-align:right;">
 11521
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 56627
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-11521
-</td>
-<td style="text-align:right;">
-217345
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4146,30 +3452,13 @@ texas
 </td>
 <td style="text-align:right;">
 7987
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 52257
 </td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-7987
-</td>
-<td style="text-align:right;">
-6258
-</td>
-<td style="text-align:left;">
-texas
-</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -4180,199 +3469,403 @@ texas
 </td>
 <td style="text-align:right;">
 22632
+</td>
+<td style="text-align:left;">
+wisconsin
 </td>
 <td style="text-align:right;">
 68120
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+75616
+</td>
 <td style="text-align:left;">
 wisconsin
+</td>
+<td style="text-align:right;">
+292751
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
 5
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+69910
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+174371
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+515978
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+4686964
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+73969
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+490858
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+532987
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+598954
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+9112
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+50420
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+5743
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+39307
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 8
 </td>
 <td style="text-align:right;">
-22632
-</td>
-<td style="text-align:right;">
-49216
+15834
 </td>
 <td style="text-align:left;">
-texas
+wisconsin
+</td>
+<td style="text-align:right;">
+38345
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-5
+1
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-75616
-</td>
-<td style="text-align:right;">
-292751
+20643
 </td>
 <td style="text-align:left;">
 wisconsin
 </td>
+<td style="text-align:right;">
+70673
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+61412
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+205733
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
 5
+</td>
+<td style="text-align:right;">
+120444
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+811577
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+626152
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+4452396
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+395778
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+342843
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2188
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+21763
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+1598
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+18008
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+9577
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+44338
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
 </td>
 <td style="text-align:right;">
 6
 </td>
 <td style="text-align:right;">
-75616
-</td>
-<td style="text-align:right;">
-172585
+10309
 </td>
 <td style="text-align:left;">
-texas
+wisconsin
+</td>
+<td style="text-align:right;">
+181514
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-5
+4
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-69910
-</td>
-<td style="text-align:right;">
-174371
+22296
 </td>
 <td style="text-align:left;">
 wisconsin
 </td>
+<td style="text-align:right;">
+46705
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
 5
+</td>
+<td style="text-align:right;">
+96555
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+1277825
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+37983
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+513597
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+1088428
+</td>
+<td style="text-align:left;">
+wisconsin
+</td>
+<td style="text-align:right;">
+4389604
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+6786158
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:right;">
-69910
-</td>
-<td style="text-align:right;">
-9357
+NA
 </td>
 <td style="text-align:left;">
 texas
 </td>
-</tr>
-<tr>
 <td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-515978
-</td>
-<td style="text-align:right;">
-4686964
-</td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-515978
-</td>
-<td style="text-align:right;">
-4465371
-</td>
-<td style="text-align:left;">
-texas
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-73969
-</td>
-<td style="text-align:right;">
-490858
-</td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-73969
-</td>
-<td style="text-align:right;">
-742336
-</td>
-<td style="text-align:left;">
-texas
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-532987
-</td>
-<td style="text-align:right;">
-598954
-</td>
-<td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:right;">
-532987
-</td>
-<td style="text-align:right;">
-366853
-</td>
-<td style="text-align:left;">
-texas
+25485
 </td>
 </tr>
 <tr>
@@ -4383,47 +3876,64 @@ texas
 3
 </td>
 <td style="text-align:right;">
-9112
-</td>
-<td style="text-align:right;">
-50420
+NA
 </td>
 <td style="text-align:left;">
-wisconsin
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-9112
+texas
 </td>
 <td style="text-align:right;">
 44697
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+NA
+</td>
 <td style="text-align:left;">
 texas
 </td>
+<td style="text-align:right;">
+258652
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:right;">
-7
+5
 </td>
 <td style="text-align:right;">
-5743
-</td>
-<td style="text-align:right;">
-39307
+NA
 </td>
 <td style="text-align:left;">
-wisconsin
+texas
+</td>
+<td style="text-align:right;">
+398885
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+41114
 </td>
 </tr>
 <tr>
@@ -4434,13 +3944,506 @@ wisconsin
 7
 </td>
 <td style="text-align:right;">
-5743
+NA
+</td>
+<td style="text-align:left;">
+texas
 </td>
 <td style="text-align:right;">
 17823
 </td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+NA
+</td>
 <td style="text-align:left;">
 texas
+</td>
+<td style="text-align:right;">
+91831
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+9551
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+22936
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+11
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+29786
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+31199
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+18342
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+41803
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+5801
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+1470
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+63750
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+18
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+21341
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+16188
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+4856
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+21
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+18021
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+22
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+18003
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+12205
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+24
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+48953
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+25
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+19596
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+26
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+27028
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+27
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+14881
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+5672
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+29
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+14064
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+30
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+51743
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+31
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+19839
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+32
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+44375
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+33
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+31274
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+34
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+4819
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+35
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+13094
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+36
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+texas
+</td>
+<td style="text-align:right;">
+118009
 </td>
 </tr>
 </tbody>
@@ -4496,7 +4499,7 @@ HENSARLING, Jeb
 4
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -4516,7 +4519,7 @@ POE, Ted
 2
 </td>
 <td style="text-align:right;">
-765383
+NA
 </td>
 <td style="text-align:right;">
 3906385
@@ -4636,7 +4639,7 @@ GOODEN, Lance
 1
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -103467,7 +103470,7 @@ texas
 CREC-2018-11-14-pt1-PgH9525-000064-20352.txt
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -103523,7 +103526,7 @@ texas
 CREC-2018-11-14-pt1-PgH9525-000065-20352.txt
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -103579,7 +103582,7 @@ texas
 CREC-2018-11-14-pt1-PgH9525-000066-20352.txt
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -103635,7 +103638,7 @@ texas
 CREC-2018-11-14-pt1-PgH9525-000067-20352.txt
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371
@@ -103691,7 +103694,7 @@ texas
 CREC-2018-11-02-pt1-PgE1491-7-000005-20528.txt
 </td>
 <td style="text-align:right;">
-765383
+NA
 </td>
 <td style="text-align:right;">
 3906385
@@ -103747,7 +103750,7 @@ texas
 CREC-2018-11-02-pt1-PgE1491-7-000006-20528.txt
 </td>
 <td style="text-align:right;">
-765383
+NA
 </td>
 <td style="text-align:right;">
 3906385
@@ -104475,7 +104478,7 @@ texas
 CREC-2020-04-03-pt1-PgH1876-3-000004-21925.txt
 </td>
 <td style="text-align:right;">
-515978
+NA
 </td>
 <td style="text-align:right;">
 4465371

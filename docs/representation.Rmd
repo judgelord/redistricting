@@ -150,13 +150,16 @@ TODO
 ```{r}
 # facebook friend data
 fb <- read_csv(here::here("data", "WI_congress_facebook_sci_pop.txt"))  %>% 
-  mutate_all(as.integer)
+  mutate_all(as.integer) %>% 
+  mutate(state = "wisconsin")
 
 names(fb) %<>% str_remove("_C.*")
 
 # cell phone mobility data
-flow <- read_csv(here::here("data", "WI_DistrictFlows_January_2020.csv")) %>% mutate(state = "wisconsin") %>% 
-  full_join(read_csv(here::here("data", "TX_DistrictFlows_January_2020.csv")) %>% mutate(state = "texas"))
+flow <- read_csv(here::here("data", "WI_DistrictFlows_January_2020.csv")) %>%
+                   mutate(state = "wisconsin")  %>% 
+  full_join(read_csv(here::here("data", "TX_DistrictFlows_January_2020.csv")) %>% 
+              mutate(state = "texas"))
 
 flow %<>% 
   mutate(OD_Pairs = OD_Pairs %>% str_remove_all("\\(|\\)")) %>% 
